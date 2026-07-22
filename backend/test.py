@@ -1,14 +1,5 @@
-import os
-from pathlib import Path
+from app.vectorstore.chroma_service import ChromaService
 
+db = ChromaService()
 
-class Student:
-    pass
-
-
-def hello():
-    print("Hello")
-
-
-def add(a, b):
-    return a + b
+print("Connected successfully!")
