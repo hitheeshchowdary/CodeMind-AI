@@ -15,16 +15,35 @@ class RepositoryService:
     def analyze_repository(self, repository_path: Path):
         """
         Analyze repository and store all chunks in ChromaDB.
+
+        Existing chunks for the same repository are removed
+        before storing the newly generated chunks.
         """
 
-        files = parse_repository(str(repository_path))
+        repository_name = repository_path.name
 
+        # Remove existing chunks for this repository
+        self.chroma_service.delete_repository_chunks(
+            repository_name
+        )
+
+        # Parse repository
+        files = parse_repository(
+            str(repository_path)
+        )
+
+        # Collect all chunks
         all_chunks = []
 
         for file in files:
-            all_chunks.extend(file["chunks"])
+            all_chunks.extend(
+                file["chunks"]
+            )
 
+        # Store fresh chunks in ChromaDB
         if all_chunks:
-            self.chroma_service.add_chunks(all_chunks)
+            self.chroma_service.add_chunks(
+                all_chunks
+            )
 
         return files

@@ -8,7 +8,7 @@ class LLMService:
 
     def __init__(self):
         self.client = Client(host="http://localhost:11434")
-        self.model = "mistral:latest"
+        self.model = "llama3.2:3b"
 
     def generate_response(self, prompt: str) -> str:
         """

@@ -5,10 +5,13 @@ from app.parser.python_parser import parse_python_file
 from app.services.file_reader_service import FileReaderService
 from app.services.chunk_service import ChunkService
 
+
 SUPPORTED_EXTENSIONS = {
     ".py": "Python",
     ".js": "JavaScript",
+    ".jsx": "JavaScript React",
     ".ts": "TypeScript",
+    ".tsx": "TypeScript React",
     ".java": "Java",
     ".cpp": "C++",
     ".md": "Markdown",
@@ -16,6 +19,7 @@ SUPPORTED_EXTENSIONS = {
     ".html": "HTML",
     ".css": "CSS",
 }
+
 
 IGNORED_DIRECTORIES = {
     "node_modules",
@@ -26,6 +30,7 @@ IGNORED_DIRECTORIES = {
     "dist",
     "build",
 }
+
 
 IGNORED_FILES = {
     "package-lock.json",
@@ -51,16 +56,27 @@ def parse_repository(repository_path: str):
     for root, dirs, filenames in os.walk(repository_path):
 
         # Skip unwanted directories
-        dirs[:] = [d for d in dirs if d not in IGNORED_DIRECTORIES]
+        dirs[:] = [
+            directory
+            for directory in dirs
+            if directory not in IGNORED_DIRECTORIES
+        ]
 
         print(f"Current Folder: {root}")
         print(f"Files Found: {filenames}\n")
 
         for filename in filenames:
 
+            # Ignore unnecessary files
+            if filename in IGNORED_FILES:
+                print(f"Ignoring: {filename}")
+                continue
+
             file_path = Path(root) / filename
+
             extension = file_path.suffix.lower()
 
+            # Skip unsupported file types
             if extension not in SUPPORTED_EXTENSIONS:
                 print(f"Skipping: {filename}")
                 continue
@@ -72,7 +88,10 @@ def parse_repository(repository_path: str):
                 "path": file_path.as_posix(),
                 "extension": extension,
                 "language": SUPPORTED_EXTENSIONS[extension],
-                "size_kb": round(file_path.stat().st_size / 1024, 2),
+                "size_kb": round(
+                    file_path.stat().st_size / 1024,
+                    2
+                ),
             }
 
             # Read file
@@ -80,23 +99,31 @@ def parse_repository(repository_path: str):
 
             # Generate chunks
             if success:
+
                 file_info["content"] = content
+
                 file_info["chunks"] = chunk_service.chunk_text(
                     repository_name=Path(repository_path).name,
                     file_name=file_path.name,
                     file_path=file_path.as_posix(),
                     language=SUPPORTED_EXTENSIONS[extension],
-                    text=content
+                    text=content,
                 )
+
             else:
+
                 file_info["content"] = ""
                 file_info["chunks"] = []
 
             # Parse Python AST only for Python files
             if extension == ".py":
-                file_info.update(parse_python_file(file_path))
+                file_info.update(
+                    parse_python_file(file_path)
+                )
 
-            # Append EVERY supported file
+            # Add supported file
             files.append(file_info)
+
+    print(f"\nTotal Files Parsed: {len(files)}")
 
     return files

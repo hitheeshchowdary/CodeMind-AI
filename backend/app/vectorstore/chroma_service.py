@@ -11,12 +11,12 @@ class ChromaService:
     """
 
     def __init__(self):
-        # Create / Load persistent database
+        # Create / load persistent database
         self.client = chromadb.PersistentClient(
             path="./chroma_db"
         )
 
-        # Create / Load collection
+        # Create / load collection
         self.collection = self.client.get_or_create_collection(
             name="repository_chunks"
         )
@@ -38,7 +38,6 @@ class ChromaService:
         metadatas = []
 
         for chunk in chunks:
-
             ids.append(chunk.chunk_id)
 
             documents.append(chunk.content)
@@ -69,7 +68,10 @@ class ChromaService:
         top_k: int = 5,
     ):
         """
-        Search the most relevant chunks for a user query.
+        Search for the most relevant chunks in a repository.
+
+        Returns:
+            A list of clean chunk dictionaries.
         """
 
         query_embedding = self.embedding_service.generate_embedding(
@@ -81,25 +83,85 @@ class ChromaService:
             n_results=top_k,
             where={
                 "repository_name": repository_name
+            },
+        )
+
+        documents = results.get(
+            "documents", [[]]
+        )[0]
+
+        metadatas = results.get(
+            "metadatas", [[]]
+        )[0]
+
+        distances = results.get(
+            "distances", [[]]
+        )[0]
+
+        retrieved_chunks = []
+
+        for document, metadata, distance in zip(
+            documents,
+            metadatas,
+            distances,
+        ):
+            retrieved_chunks.append(
+                {
+                    "content": document,
+                    "file_name": metadata.get(
+                        "file_name",
+                        "Unknown",
+                    ),
+                    "file_path": metadata.get(
+                        "file_path",
+                        "",
+                    ),
+                    "language": metadata.get(
+                        "language",
+                        "",
+                    ),
+                    "chunk_index": metadata.get(
+                        "chunk_index",
+                        0,
+                    ),
+                    "distance": distance,
+                }
+            )
+
+        return retrieved_chunks
+
+    def delete_repository_chunks(
+        self,
+        repository_name: str,
+    ):
+        """
+        Delete all chunks belonging to a specific repository.
+        """
+
+        self.collection.delete(
+            where={
+                "repository_name": repository_name
             }
         )
 
-        return results
-
     def delete_collection(self):
         """
-        Delete the current collection.
+        Delete the entire ChromaDB collection.
         """
 
-        self.client.delete_collection("repository_chunks")
+        self.client.delete_collection(
+            "repository_chunks"
+        )
 
     def reset_collection(self):
         """
-        Recreate the collection.
+        Delete and recreate the entire collection.
         """
 
         try:
-            self.client.delete_collection("repository_chunks")
+            self.client.delete_collection(
+                "repository_chunks"
+            )
         except Exception:
             pass
 

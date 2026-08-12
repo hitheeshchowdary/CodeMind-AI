@@ -1,6 +1,3 @@
-from typing import Dict, Any
-
-
 class PromptBuilder:
     """
     Builds prompts for the LLM using retrieved repository chunks.
@@ -13,56 +10,44 @@ Your job is to answer questions ONLY using the provided repository context.
 
 Rules:
 1. Use only the provided repository context.
-2. Do NOT make up functions, files, or implementations.
-3. If the answer is not found in the context, reply:
+2. Do NOT invent files, functions, variables, or implementations.
+3. If the answer cannot be determined from the provided context, say:
    "I couldn't find that information in the repository."
-4. Explain code clearly and concisely.
-5. Mention relevant filenames whenever possible.
+4. Explain the code clearly and concisely.
+5. Mention the relevant filename when explaining something.
+6. Do not assume that code exists if it is not present in the context.
 """.strip()
 
     def build_prompt(
         self,
         question: str,
-        retrieved_chunks: Dict[str, Any]
+        retrieved_chunks: list
     ) -> str:
         """
-        Builds a prompt from ChromaDB search results.
-
-        Args:
-            question: User's question.
-            retrieved_chunks: Result returned by ChromaDB.
-
-        Returns:
-            Formatted prompt string.
+        Build an LLM prompt from retrieved repository chunks.
         """
 
         context = []
 
-        documents = retrieved_chunks.get("documents", [[]])
-        metadatas = retrieved_chunks.get("metadatas", [[]])
+        for chunk in retrieved_chunks:
 
-        if documents and metadatas:
-
-            for document, metadata in zip(documents[0], metadatas[0]):
-
-                file_name = metadata.get("file_name", "Unknown File")
-                file_path = metadata.get("file_path", "")
-
-                context.append(
-                    f"""
-File: {file_name}
-Path: {file_path}
+            context.append(
+                f"""
+File: {chunk["file_name"]}
+Path: {chunk["file_path"]}
+Language: {chunk["language"]}
+Chunk: {chunk["chunk_index"]}
 
 Code:
-{document}
+{chunk["content"]}
 
 ------------------------------------------------------------
 """.strip()
-                )
+            )
 
         repository_context = "\n\n".join(context)
 
-        prompt = f"""
+        return f"""
 {self.SYSTEM_PROMPT}
 
 ==================== Repository Context ====================
@@ -76,5 +61,3 @@ User Question:
 
 Answer:
 """.strip()
-
-        return prompt
