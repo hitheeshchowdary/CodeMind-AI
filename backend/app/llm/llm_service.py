@@ -7,35 +7,45 @@ class LLMService:
     """
 
     def __init__(self):
-        self.client = Client(host="http://localhost:11434")
+
+        self.client = Client(
+            host="http://localhost:11434"
+        )
+
         self.model = "llama3.2:3b"
 
-    def generate_response(self, prompt: str) -> str:
+    def generate_response(
+        self,
+        prompt: str,
+    ) -> str:
         """
-        Sends the prompt to Ollama and returns the generated response.
+        Send a prompt to Ollama and return
+        the generated response.
         """
 
         try:
+
             response = self.client.chat(
                 model=self.model,
                 messages=[
                     {
-                        "role": "system",
-                        "content": (
-                            "You are CodeMind AI, an expert software engineer. "
-                            "Answer questions ONLY using the repository context provided. "
-                            "If the answer is not present, say "
-                            "'I couldn't find that information in the repository.'"
-                        ),
-                    },
-                    {
                         "role": "user",
                         "content": prompt,
-                    },
+                    }
                 ],
+                options={
+                    "temperature": 0.2,
+                    "num_predict": 400,
+                },
             )
 
-            return response["message"]["content"].strip()
+            return (
+                response["message"]["content"]
+                .strip()
+            )
 
-        except Exception as e:
-            raise RuntimeError(f"Ollama Error: {e}")
+        except Exception as error:
+
+            raise RuntimeError(
+                f"Ollama Error: {error}"
+            )

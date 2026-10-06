@@ -1,50 +1,72 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File,
+    HTTPException,
+)
 from pydantic import BaseModel
 
-from app.services.upload_service import UploadService
-from app.services.repository_service import RepositoryService
-from app.services.analytics_service import AnalyticsService
+from app.services.upload_service import (
+    UploadService,
+)
+from app.services.repository_service import (
+    RepositoryService,
+)
+from app.services.analytics_service import (
+    AnalyticsService,
+)
 
 
 router = APIRouter()
 
 
+class RepositoryFile(BaseModel):
+    """
+    Safe file information returned to the frontend.
+    """
+
+    name: str
+    path: str
+    language: str
+
+
 class UploadResponse(BaseModel):
     """
-    Response returned after repository upload and analysis.
+    Response returned after repository upload
+    and analysis.
     """
 
     message: str
     repository_name: str
     total_files: int
     languages: list[str]
-    files: list
+    files: list[RepositoryFile]
 
 
 @router.post(
     "/repository/upload",
-    response_model=UploadResponse
+    response_model=UploadResponse,
 )
 async def upload_repository(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
 ):
     """
-    Upload a GitHub repository ZIP, extract it,
+    Upload a repository ZIP file, extract it,
     analyze it, and return repository metadata.
     """
 
-    # Validate filename
     if not file.filename:
         raise HTTPException(
             status_code=400,
-            detail="A file is required."
+            detail="A file is required.",
         )
 
-    # Validate file type
-    if not file.filename.lower().endswith(".zip"):
+    if not file.filename.lower().endswith(
+        ".zip"
+    ):
         raise HTTPException(
             status_code=400,
-            detail="Only ZIP files are allowed."
+            detail="Only ZIP files are allowed.",
         )
 
     try:
@@ -55,37 +77,48 @@ async def upload_repository(
             upload_service.save_and_extract(file)
         )
 
-        # Analyze repository
-        repository_service = RepositoryService()
-
-        files = repository_service.analyze_repository(
-            extract_folder
+        # Analyze repository and store chunks
+        repository_service = (
+            RepositoryService()
         )
 
-        # Build analytics response
-        analytics_service = AnalyticsService()
+        files = (
+            repository_service.analyze_repository(
+                extract_folder
+            )
+        )
 
-        response = analytics_service.build_response(
-            repository_name=destination.stem,
-            files=files
+        # Build JSON-safe response
+        analytics_service = (
+            AnalyticsService()
+        )
+
+        response = (
+            analytics_service.build_response(
+                repository_name=extract_folder.name,
+                files=files,
+            )
         )
 
         return response
 
-    except ValueError as e:
+    except ValueError as error:
         raise HTTPException(
             status_code=400,
-            detail=str(e)
+            detail=str(error),
         )
 
-    except RuntimeError as e:
+    except RuntimeError as error:
         raise HTTPException(
             status_code=500,
-            detail=str(e)
+            detail=str(error),
         )
 
-    except Exception as e:
+    except Exception as error:
         raise HTTPException(
             status_code=500,
-            detail=f"Repository upload failed: {str(e)}"
+            detail=(
+                "Repository upload failed: "
+                f"{str(error)}"
+            ),
         )

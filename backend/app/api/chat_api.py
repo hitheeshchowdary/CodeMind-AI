@@ -27,7 +27,7 @@ class ChatRequest(BaseModel):
     )
 
     top_k: int = Field(
-        default=5,
+        default=3,
         ge=1,
         le=10,
         description="Number of repository chunks to retrieve."

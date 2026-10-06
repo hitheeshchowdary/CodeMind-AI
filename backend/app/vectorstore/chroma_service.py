@@ -1,3 +1,5 @@
+import time
+
 import chromadb
 
 from app.embeddings.embedding_service import EmbeddingService
@@ -74,9 +76,34 @@ class ChromaService:
             A list of clean chunk dictionaries.
         """
 
-        query_embedding = self.embedding_service.generate_embedding(
-            query
+        total_start = time.perf_counter()
+
+        # ----------------------------------------
+        # Step 1: Generate query embedding
+        # ----------------------------------------
+
+        embedding_start = time.perf_counter()
+
+        query_embedding = (
+            self.embedding_service.generate_embedding(
+                query
+            )
         )
+
+        embedding_time = (
+            time.perf_counter() - embedding_start
+        )
+
+        print(
+            f"Query embedding: "
+            f"{embedding_time:.2f} seconds"
+        )
+
+        # ----------------------------------------
+        # Step 2: Search ChromaDB
+        # ----------------------------------------
+
+        chroma_start = time.perf_counter()
 
         results = self.collection.query(
             query_embeddings=[query_embedding],
@@ -86,16 +113,32 @@ class ChromaService:
             },
         )
 
+        chroma_time = (
+            time.perf_counter() - chroma_start
+        )
+
+        print(
+            f"ChromaDB query: "
+            f"{chroma_time:.2f} seconds"
+        )
+
+        # ----------------------------------------
+        # Step 3: Format results
+        # ----------------------------------------
+
         documents = results.get(
-            "documents", [[]]
+            "documents",
+            [[]],
         )[0]
 
         metadatas = results.get(
-            "metadatas", [[]]
+            "metadatas",
+            [[]],
         )[0]
 
         distances = results.get(
-            "distances", [[]]
+            "distances",
+            [[]],
         )[0]
 
         retrieved_chunks = []
@@ -127,6 +170,15 @@ class ChromaService:
                     "distance": distance,
                 }
             )
+
+        total_time = (
+            time.perf_counter() - total_start
+        )
+
+        print(
+            f"Total retrieval process: "
+            f"{total_time:.2f} seconds"
+        )
 
         return retrieved_chunks
 

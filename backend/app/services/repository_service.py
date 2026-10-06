@@ -1,49 +1,149 @@
 from pathlib import Path
 
-from app.parser.repository_parser import parse_repository
-from app.vectorstore import ChromaService
+from app.parser.repository_parser import (
+    parse_repository,
+)
+
+from app.vectorstore.chroma_service import (
+    ChromaService,
+)
+
+from app.services.repository_metadata_service import (
+    RepositoryMetadataService,
+)
 
 
 class RepositoryService:
     """
-    Handles all repository analysis operations.
+    Handles repository parsing, indexing,
+    and metadata storage.
     """
 
     def __init__(self):
-        self.chroma_service = ChromaService()
 
-    def analyze_repository(self, repository_path: Path):
+        self.chroma_service = (
+            ChromaService()
+        )
+
+        self.metadata_service = (
+            RepositoryMetadataService()
+        )
+
+    def analyze_repository(
+        self,
+        repository_path: Path,
+    ):
         """
-        Analyze repository and store all chunks in ChromaDB.
-
-        Existing chunks for the same repository are removed
-        before storing the newly generated chunks.
+        Analyze and index a repository.
         """
 
-        repository_name = repository_path.name
+        repository_name = (
+            repository_path.name
+        )
 
-        # Remove existing chunks for this repository
+        print(
+            f"Indexing repository: "
+            f"{repository_name}"
+        )
+
+        # -----------------------------------------
+        # Remove previous data
+        # -----------------------------------------
+
         self.chroma_service.delete_repository_chunks(
             repository_name
         )
 
+        self.metadata_service.delete_repository(
+            repository_name
+        )
+
+        # -----------------------------------------
         # Parse repository
+        # -----------------------------------------
+
         files = parse_repository(
             str(repository_path)
         )
 
-        # Collect all chunks
+        # -----------------------------------------
+        # Collect chunks
+        # -----------------------------------------
+
         all_chunks = []
 
         for file in files:
-            all_chunks.extend(
-                file["chunks"]
+
+            chunks = file.get(
+                "chunks",
+                [],
             )
 
-        # Store fresh chunks in ChromaDB
+            all_chunks.extend(
+                chunks
+            )
+
+        # -----------------------------------------
+        # Store chunks in ChromaDB
+        # -----------------------------------------
+
         if all_chunks:
+
             self.chroma_service.add_chunks(
                 all_chunks
             )
+
+        # -----------------------------------------
+        # Prepare metadata
+        # -----------------------------------------
+
+        metadata_files = []
+
+        for file in files:
+
+            metadata_files.append(
+                {
+                    "name": file.get(
+                        "name"
+                    ),
+
+                    "path": file.get(
+                        "path"
+                    ),
+
+                    "extension": file.get(
+                        "extension"
+                    ),
+
+                    "language": file.get(
+                        "language"
+                    ),
+
+                    "size_kb": file.get(
+                        "size_kb"
+                    ),
+                }
+            )
+
+        # -----------------------------------------
+        # Save metadata
+        # -----------------------------------------
+
+        self.metadata_service.save_repository(
+            repository_name=repository_name,
+            files=metadata_files,
+        )
+
+        print(
+            f"Repository indexed successfully."
+        )
+
+        print(
+            f"Files: {len(files)}"
+        )
+
+        print(
+            f"Chunks: {len(all_chunks)}"
+        )
 
         return files
