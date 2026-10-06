@@ -1,34 +1,8 @@
-import {
+import { useEffect, useMemo, useRef, useState } from 'react'
 
-  useEffect,
+import { askRepositoryQuestion } from '../services/chatService'
 
-  useMemo,
-
-  useRef,
-
-  useState,
-
-} from 'react'
-
-
-
-import {
-
-  askRepositoryQuestion,
-
-} from '../services/chatService'
-
-
-
-
-
-const CHAT_STORAGE_KEY =
-
-  'codemind_repository_chat_histories_v2'
-
-
-
-
+const CHAT_STORAGE_KEY = 'codemind_repository_chat_histories_v2'
 
 /* =========================================================
    QUESTION SUGGESTION ENGINE
@@ -43,26 +17,20 @@ function normalizeText(value = '') {
 }
 
 function uniqueStrings(items) {
-  return [...new Set(
-    items
-      .map((item) => String(item || '').trim())
-      .filter(Boolean),
-  )]
+  return [
+    ...new Set(
+      items.map((item) => String(item || '').trim()).filter(Boolean),
+    ),
+  ]
 }
 
 function getRepositorySignals(repository) {
-  const files = Array.isArray(repository?.files)
-    ? repository.files
-    : []
-
+  const files = Array.isArray(repository?.files) ? repository.files : []
   const languages = Array.isArray(repository?.languages)
     ? repository.languages
     : []
 
-  const filePaths = uniqueStrings(
-    files.map((file) => getFilePath(file)),
-  )
-
+  const filePaths = uniqueStrings(files.map((file) => getFilePath(file)))
   const fileNames = uniqueStrings(
     filePaths.map((filePath) => getDisplayFileName(filePath)),
   )
@@ -84,19 +52,13 @@ function getRepositorySignals(repository) {
     normalizedLanguages,
     fileCount: filePaths.length,
     languageCount: languages.length,
-    hasPython: normalizedLanguages.some((value) =>
-      value.includes('python'),
+    hasPython: normalizedLanguages.some((v) => v.includes('python')),
+    hasJava: normalizedLanguages.some((v) => v === 'java'),
+    hasJavaScript: normalizedLanguages.some(
+      (v) => v.includes('javascript') || v.includes('typescript'),
     ),
-    hasJava: normalizedLanguages.some((value) =>
-      value.includes('java'),
-    ),
-    hasJavaScript: normalizedLanguages.some((value) =>
-      value.includes('javascript') ||
-      value.includes('typescript'),
-    ),
-    hasReact: normalizedLanguages.some((value) =>
-      value.includes('react'),
-    ) || hasAny('react'),
+    hasReact:
+      normalizedLanguages.some((v) => v.includes('react')) || hasAny('react'),
     hasDatabase: hasAny(
       'database',
       'db',
@@ -126,23 +88,9 @@ function getRepositorySignals(repository) {
       'token',
       'jwt',
     ),
-    hasParser: hasAny(
-      'parser',
-      'parse',
-      'extract',
-      'processor',
-    ),
-    hasServiceLayer: hasAny(
-      'service',
-      'services',
-      'usecase',
-      'usecases',
-    ),
-    hasTestFiles: hasAny(
-      'test',
-      'tests',
-      'spec',
-    ),
+    hasParser: hasAny('parser', 'parse', 'extract', 'processor'),
+    hasServiceLayer: hasAny('service', 'services', 'usecase', 'usecases'),
+    hasTestFiles: hasAny('test', 'tests', 'spec'),
     hasConfig: hasAny(
       'config',
       'settings',
@@ -165,8 +113,9 @@ function getRepositorySignals(repository) {
       'tsx',
     ),
     hasMainFile: normalizedNames.some((name) =>
-      ['app py', 'main py', 'index js', 'index jsx', 'app js', 'app jsx']
-        .some((candidate) => name === candidate),
+      ['app py', 'main py', 'index js', 'index jsx', 'app js', 'app jsx'].includes(
+        name,
+      ),
     ),
   }
 }
@@ -196,12 +145,7 @@ function buildQuestionSuggestions({
 
   const candidates = []
 
-  const add = (
-    text,
-    category,
-    score = 0,
-    evidence = false,
-  ) => {
+  const add = (text, category, score = 0, evidence = false) => {
     const normalized = normalizeText(text)
 
     if (
@@ -212,45 +156,34 @@ function buildQuestionSuggestions({
       return
     }
 
-    candidates.push({
-      text,
-      category,
-      score: score + (evidence ? 8 : 0),
-    })
+    candidates.push({ text, category, score: score + (evidence ? 8 : 0) })
   }
 
-  /*
-   * Every repository gets a small set of high-value exploration
-   * questions. These are deliberately deterministic and cheap.
-   */
+  // Baseline exploration questions.
   add(
     'Which files are most important to understanding this project?',
     'exploration',
     7,
     signals.fileCount > 0,
   )
-
   add(
     'What is the main execution flow of this project?',
     'workflow',
     8,
     signals.fileCount > 1,
   )
-
   add(
     'Which file contains the main application logic?',
     'code',
     7,
     signals.hasMainFile,
   )
-
   add(
     'How do the main components of this project interact?',
     'architecture',
     8,
     signals.fileCount > 1,
   )
-
   add(
     'What are the main technologies and frameworks used here?',
     'technology',
@@ -258,17 +191,9 @@ function buildQuestionSuggestions({
     signals.languageCount > 0,
   )
 
-  /*
-   * Repository-grounded feature questions.
-   */
+  // Repository-grounded feature questions.
   if (signals.hasApi) {
-    add(
-      'How does the API layer work in this project?',
-      'api',
-      14,
-      true,
-    )
-
+    add('How does the API layer work in this project?', 'api', 14, true)
     add(
       'Which files define the main API routes or endpoints?',
       'api',
@@ -287,13 +212,7 @@ function buildQuestionSuggestions({
   }
 
   if (signals.hasDatabase) {
-    add(
-      'How does this project store and manage data?',
-      'data',
-      14,
-      true,
-    )
-
+    add('How does this project store and manage data?', 'data', 14, true)
     add(
       'Which files are responsible for database or data access?',
       'data',
@@ -310,10 +229,11 @@ function buildQuestionSuggestions({
       true,
     )
 
-    const parserFiles = getFileCandidates(
-      signals,
-      ['parser', 'parse', 'extract'],
-    )
+    const parserFiles = getFileCandidates(signals, [
+      'parser',
+      'parse',
+      'extract',
+    ])
 
     if (parserFiles.length === 1) {
       add(
@@ -335,12 +255,7 @@ function buildQuestionSuggestions({
   }
 
   if (signals.hasUi || signals.hasReact) {
-    add(
-      'How is the user interface organized?',
-      'frontend',
-      12,
-      true,
-    )
+    add('How is the user interface organized?', 'frontend', 12, true)
 
     if (signals.hasReact) {
       add(
@@ -380,13 +295,7 @@ function buildQuestionSuggestions({
   }
 
   if (signals.hasTestFiles) {
-    add(
-      'What tests are already available in this project?',
-      'testing',
-      12,
-      true,
-    )
-
+    add('What tests are already available in this project?', 'testing', 12, true)
     add(
       'Which important parts of the project are not covered by tests?',
       'testing',
@@ -396,35 +305,17 @@ function buildQuestionSuggestions({
   }
 
   if (signals.hasConfig) {
-    add(
-      'Where is the project configuration defined?',
-      'configuration',
-      10,
-      true,
-    )
+    add('Where is the project configuration defined?', 'configuration', 10, true)
   }
 
-  /*
-   * Follow-ups based on the current question.
-   * These are deliberately different from the repository-wide defaults.
-   */
+  // Follow-ups based on the current question.
   if (
     question.includes('architecture') ||
     question.includes('workflow') ||
     question.includes('flow')
   ) {
-    add(
-      'Which files participate in this workflow?',
-      'architecture',
-      18,
-    )
-
-    add(
-      'What happens first, and what happens next in this flow?',
-      'workflow',
-      16,
-    )
-
+    add('Which files participate in this workflow?', 'architecture', 18)
+    add('What happens first, and what happens next in this flow?', 'workflow', 16)
     add(
       'Where is the most important business logic for this flow?',
       'code',
@@ -443,13 +334,11 @@ function buildQuestionSuggestions({
       'code',
       18,
     )
-
     add(
       'What is the end-to-end workflow of the main feature?',
       'workflow',
       17,
     )
-
     add(
       'Which component is responsible for the main functionality?',
       'architecture',
@@ -463,12 +352,7 @@ function buildQuestionSuggestions({
     question.includes('library') ||
     question.includes('dependencies')
   ) {
-    add(
-      'Where is each major technology used in the codebase?',
-      'technology',
-      18,
-    )
-
+    add('Where is each major technology used in the codebase?', 'technology', 18)
     add(
       'Which dependencies are most important to the application?',
       'technology',
@@ -487,25 +371,11 @@ function buildQuestionSuggestions({
       'code',
       18,
     )
-
-    add(
-      'What other files depend on this implementation?',
-      'architecture',
-      17,
-    )
-
-    add(
-      'What happens when this code is executed?',
-      'workflow',
-      15,
-    )
+    add('What other files depend on this implementation?', 'architecture', 17)
+    add('What happens when this code is executed?', 'workflow', 15)
   }
 
-  /*
-   * Improvement questions are useful, but only after the user has
-   * already explored the repository. This prevents the first follow-up
-   * from immediately becoming generic "how can I improve it?" advice.
-   */
+  // Improvement questions only after the user has explored a bit.
   const hasConversation = previousMessages.some(
     (message) => message?.role === 'assistant',
   )
@@ -516,7 +386,6 @@ function buildQuestionSuggestions({
       'engineering',
       10,
     )
-
     add(
       'What part of this project would benefit most from refactoring?',
       'engineering',
@@ -532,10 +401,7 @@ function buildQuestionSuggestions({
     }
   }
 
-  /*
-   * Light answer-aware boosts. We don't trust the answer as evidence;
-   * it only helps choose a better follow-up category.
-   */
+  // Light answer-aware boosts.
   const answerBoostTerms = {
     api: ['api', 'endpoint', 'route'],
     data: ['database', 'data', 'storage'],
@@ -553,19 +419,14 @@ function buildQuestionSuggestions({
     }
   })
 
-  /*
-   * Prefer high-value repository-grounded suggestions while enforcing
-   * category diversity so five buttons don't all ask the same thing.
-   */
+  // Highest score first, with category diversity.
   candidates.sort((a, b) => b.score - a.score)
 
   const selected = []
   const usedCategories = new Set()
 
   for (const candidate of candidates) {
-    if (selected.length >= count) {
-      break
-    }
+    if (selected.length >= count) break
 
     if (!usedCategories.has(candidate.category)) {
       selected.push(candidate.text)
@@ -573,15 +434,10 @@ function buildQuestionSuggestions({
     }
   }
 
-  /*
-   * If category diversity exhausted the candidate pool, fill remaining
-   * slots with the next highest-scoring unique suggestions.
-   */
+  // Fill remaining slots if diversity exhausted the pool.
   if (selected.length < count) {
     for (const candidate of candidates) {
-      if (selected.length >= count) {
-        break
-      }
+      if (selected.length >= count) break
 
       if (!selected.includes(candidate.text)) {
         selected.push(candidate.text)
@@ -593,2549 +449,682 @@ function buildQuestionSuggestions({
 }
 
 /* =========================================================
-
-   COMPONENT
-
+   REPOSITORY FILE HELPERS
    ========================================================= */
 
+function getFilePath(file) {
+  if (typeof file === 'string') return file
+  if (!file || typeof file !== 'object') return ''
 
+  return file.path || file.file || file.name || ''
+}
+
+function getDisplayFileName(file) {
+  const filePath = getFilePath(file)
+
+  if (!filePath) return 'Unknown file'
+
+  const normalizedPath = String(filePath).replaceAll('\\', '/')
+  const parts = normalizedPath.split('/')
+
+  return parts[parts.length - 1] || normalizedPath
+}
+
+function getFileExtension(file) {
+  const fileName = getDisplayFileName(file)
+  const extension = fileName.includes('.') ? fileName.split('.').pop() : ''
+
+  return extension ? extension.toUpperCase().slice(0, 4) : 'FILE'
+}
+
+/* =========================================================
+   SOURCE HELPERS
+   ========================================================= */
+
+function getFileNameFromPath(path) {
+  if (!path) return 'Unknown source'
+
+  const normalizedPath = String(path).replaceAll('\\', '/')
+  const parts = normalizedPath.split('/')
+
+  return parts[parts.length - 1] || normalizedPath
+}
+
+function getSourceName(source) {
+  if (typeof source === 'string') return getFileNameFromPath(source)
+  if (!source || typeof source !== 'object') return 'Unknown source'
+
+  return (
+    source.filename ||
+    source.file_name ||
+    source.name ||
+    source.file ||
+    getFileNameFromPath(source.path || source.file_path || '')
+  )
+}
+
+function getSourcePath(source) {
+  if (typeof source === 'string') return source
+  if (!source || typeof source !== 'object') return ''
+
+  return source.path || source.file_path || source.file || ''
+}
+
+function getSourceRelevance(source) {
+  if (!source || typeof source !== 'object') return null
+
+  const value = source.relevance ?? source.score ?? source.similarity
+
+  // Number(null) is 0, so reject null/undefined/'' explicitly.
+  if (value === null || value === undefined || value === '') return null
+
+  const numericValue = Number(value)
+
+  return Number.isFinite(numericValue) ? numericValue : null
+}
+
+/* Unique IDs that cannot collide with messages restored from localStorage. */
+function createMessageId() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `message-${crypto.randomUUID()}`
+  }
+
+  return `message-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+/* =========================================================
+   COMPONENT
+   ========================================================= */
 
 function RepositoryWorkspace({
-
   repository,
-
   projects = [],
-
   onNewProject,
-
   onSelectProject,
-
   onRemoveProject,
-
 }) {
-
   const textareaRef = useRef(null)
-
-
-
   const chatEndRef = useRef(null)
 
+  const repositoryName = repository?.repository_name || 'repository'
 
+  /* ---------------- STATE ---------------- */
 
-  const messageIdRef = useRef(0)
+  const [question, setQuestion] = useState('')
+  const [isAsking, setIsAsking] = useState(false)
+  const [error, setError] = useState('')
 
-
-
-
-
-  const repositoryName =
-
-    repository?.repository_name ||
-
-    'repository'
-
-
-
-
-
-  /* =======================================================
-
-     STATE
-
-     ======================================================= */
-
-
-
-  const [question, setQuestion] =
-
-    useState('')
-
-
-
-  const [isAsking, setIsAsking] =
-
-    useState(false)
-
-
-
-  const [error, setError] =
-
-    useState('')
-
-
-
-
-
-  const [
-
-    chatHistories,
-
-    setChatHistories,
-
-  ] = useState(() => {
-
+  const [chatHistories, setChatHistories] = useState(() => {
     try {
+      const savedHistories = localStorage.getItem(CHAT_STORAGE_KEY)
 
-      const savedHistories =
+      if (!savedHistories) return {}
 
-        localStorage.getItem(
-
-          CHAT_STORAGE_KEY,
-
-        )
-
-
-
-      if (!savedHistories) {
-
-        return {}
-
-      }
-
-
-
-      const parsedHistories =
-
-        JSON.parse(savedHistories)
-
-
+      const parsedHistories = JSON.parse(savedHistories)
 
       if (
-
         parsedHistories &&
-
-        typeof parsedHistories ===
-
-          'object' &&
-
+        typeof parsedHistories === 'object' &&
         !Array.isArray(parsedHistories)
-
       ) {
-
         return parsedHistories
-
       }
 
-
-
       return {}
-
     } catch (storageError) {
-
-      console.error(
-
-        'Unable to load chat histories:',
-
-        storageError,
-
-      )
-
-
-
+      console.error('Unable to load chat histories:', storageError)
       return {}
-
     }
-
   })
 
+  const messages = chatHistories[repositoryName] || []
 
+  const files = Array.isArray(repository?.files) ? repository.files : []
 
-
-
-  const messages =
-
-    chatHistories[repositoryName] || []
-
-
-
-
-
-  const files = Array.isArray(
-
-    repository?.files,
-
-  )
-
-    ? repository.files
-
-    : []
-
-
-
-
-
-  const languages = Array.isArray(
-
-    repository?.languages,
-
-  )
-
+  const languages = Array.isArray(repository?.languages)
     ? repository.languages
-
     : []
 
-
-
-
-
-  /*
-
-   * Initial suggestions are deterministic.
-
-   * Math.random() is NOT used during rendering.
-
-   */
-
-  const initialSuggestions = useMemo(
+  // Show every file returned by the backend, sorted by path.
+  const displayFiles = useMemo(
     () =>
-      buildQuestionSuggestions({
-        repository,
-        count: 5,
-      }),
+      [...files].sort((a, b) =>
+        getFilePath(a).localeCompare(getFilePath(b), undefined, {
+          sensitivity: 'base',
+        }),
+      ),
+    [files],
+  )
+
+  // Deterministic initial suggestions (no Math.random during render).
+  const initialSuggestions = useMemo(
+    () => buildQuestionSuggestions({ repository, count: 5 }),
     [repository],
   )
 
-
-
-
-
-  const getNextMessageId = () => {
-
-    messageIdRef.current += 1
-
-
-
-    return `message-${messageIdRef.current}`
-
-  }
-
-
-
-
-
-  /* =======================================================
-
-     CHAT HISTORY STORAGE
-
-     ======================================================= */
-
-
+  /* ---------------- CHAT HISTORY STORAGE ---------------- */
 
   useEffect(() => {
-
     try {
-
-      localStorage.setItem(
-
-        CHAT_STORAGE_KEY,
-
-        JSON.stringify(chatHistories),
-
-      )
-
+      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistories))
     } catch (storageError) {
-
-      console.error(
-
-        'Unable to save chat histories:',
-
-        storageError,
-
-      )
-
+      console.error('Unable to save chat histories:', storageError)
     }
-
   }, [chatHistories])
 
-
-
-
-
-  /* =======================================================
-
-     AUTO SCROLL
-
-     ======================================================= */
-
-
+  /* ---------------- AUTO SCROLL ---------------- */
 
   useEffect(() => {
-
     chatEndRef.current?.scrollIntoView({
-
       behavior: 'smooth',
-
       block: 'nearest',
-
     })
-
   }, [messages.length, isAsking])
 
-
-
-
-
-  /* =======================================================
-
-     TEXTAREA AUTO RESIZE
-
-     ======================================================= */
-
-
-
-  const resizeTextarea = () => {
-
-    const textarea =
-
-      textareaRef.current
-
-
-
-    if (!textarea) {
-
-      return
-
-    }
-
-
-
-    textarea.style.height = 'auto'
-
-
-
-    const maximumHeight = 120
-
-
-
-    const newHeight = Math.min(
-
-      textarea.scrollHeight,
-
-      maximumHeight,
-
-    )
-
-
-
-    textarea.style.height =
-
-      `${newHeight}px`
-
-
-
-    textarea.style.overflowY =
-
-      textarea.scrollHeight >
-
-      maximumHeight
-
-        ? 'auto'
-
-        : 'hidden'
-
-  }
-
-
-
-
+  /* ---------------- TEXTAREA AUTO RESIZE ---------------- */
 
   useEffect(() => {
-
     requestAnimationFrame(() => {
+      const textarea = textareaRef.current
 
-      resizeTextarea()
+      if (!textarea) return
 
+      textarea.style.height = 'auto'
+
+      const maximumHeight = 120
+      const newHeight = Math.min(textarea.scrollHeight, maximumHeight)
+
+      textarea.style.height = `${newHeight}px`
+      textarea.style.overflowY =
+        textarea.scrollHeight > maximumHeight ? 'auto' : 'hidden'
     })
-
   }, [question])
 
-
-
-
-
-  /* =======================================================
-
-     ADD MESSAGE
-
-     ======================================================= */
-
-
+  /* ---------------- ADD MESSAGE ---------------- */
 
   const addMessage = (message) => {
+    setChatHistories((currentHistories) => {
+      const currentMessages = currentHistories[repositoryName] || []
 
-    setChatHistories(
-
-      (currentHistories) => {
-
-        const currentMessages =
-
-          currentHistories[
-
-            repositoryName
-
-          ] || []
-
-
-
-        return {
-
-          ...currentHistories,
-
-
-
-          [repositoryName]: [
-
-            ...currentMessages,
-
-            message,
-
-          ],
-
-        }
-
-      },
-
-    )
-
+      return {
+        ...currentHistories,
+        [repositoryName]: [...currentMessages, message],
+      }
+    })
   }
 
+  /* ---------------- REMOVE CHAT HISTORY ---------------- */
 
+  // Persisting is handled by the effect above; no side effects in the updater.
+  const removeChatHistory = (projectName) => {
+    setChatHistories((currentHistories) => {
+      const updatedHistories = { ...currentHistories }
 
+      delete updatedHistories[projectName]
 
-
-  /* =======================================================
-
-     REMOVE CHAT HISTORY
-
-     ======================================================= */
-
-
-
-  const removeChatHistory = (
-
-    projectName,
-
-  ) => {
-
-    setChatHistories(
-
-      (currentHistories) => {
-
-        const updatedHistories = {
-
-          ...currentHistories,
-
-        }
-
-
-
-        delete updatedHistories[
-
-          projectName
-
-        ]
-
-
-
-        try {
-
-          localStorage.setItem(
-
-            CHAT_STORAGE_KEY,
-
-            JSON.stringify(
-
-              updatedHistories,
-
-            ),
-
-          )
-
-        } catch (storageError) {
-
-          console.error(
-
-            'Unable to remove chat history:',
-
-            storageError,
-
-          )
-
-        }
-
-
-
-        return updatedHistories
-
-      },
-
-    )
-
+      return updatedHistories
+    })
   }
 
+  /* ---------------- ASK QUESTION ---------------- */
 
+  const handleAskQuestion = async (providedQuestion = question) => {
+    // onClick handlers can pass an event object; only accept strings.
+    const rawQuestion =
+      typeof providedQuestion === 'string' ? providedQuestion : question
 
+    const trimmedQuestion = rawQuestion.trim()
 
+    if (!trimmedQuestion || isAsking) return
 
-  /* =======================================================
-
-     ASK QUESTION
-
-     ======================================================= */
-
-
-
-  const handleAskQuestion = async (
-
-    providedQuestion = question,
-
-  ) => {
-
-    const trimmedQuestion =
-
-      String(
-
-        providedQuestion || '',
-
-      ).trim()
-
-
-
-    if (
-
-      !trimmedQuestion ||
-
-      isAsking
-
-    ) {
-
-      return
-
-    }
-
-
-
-
-
-    const userMessage = {
-
-      id: getNextMessageId(),
-
-
-
+    addMessage({
+      id: createMessageId(),
       role: 'user',
-
-
-
       content: trimmedQuestion,
-
-    }
-
-
-
-
-
-    addMessage(userMessage)
-
-
+    })
 
     setQuestion('')
-
     setError('')
-
     setIsAsking(true)
 
-
-
-
-
     try {
+      const data = await askRepositoryQuestion({
+        repositoryName,
+        question: trimmedQuestion,
+        topK: 5,
+      })
 
-      const data =
-
-        await askRepositoryQuestion({
-
-          repositoryName,
-
-
-
-          question:
-
-            trimmedQuestion,
-
-
-
-          topK: 5,
-
-        })
-
-
-
-
-
-      const assistantMessage = {
-
-        id: getNextMessageId(),
-
-
-
+      addMessage({
+        id: createMessageId(),
         role: 'assistant',
-
-
-
-        content:
-
-          data?.answer ||
-
-          'I could not find an answer in this repository.',
-
-
-
-        sources: Array.isArray(
-
-          data?.sources,
-
-        )
-
-          ? data.sources
-
-          : [],
-
-
-
-        /*
-
-         * Random suggestions are generated
-
-         * inside an event handler, not render.
-
-         */
-
-        suggestions:
-          buildQuestionSuggestions({
-            repository,
-            currentQuestion: trimmedQuestion,
-            currentAnswer: data?.answer || '',
-            previousMessages: messages,
-            count: 5,
-          }),
-
-      }
-
-
-
-
-
-      addMessage(
-
-        assistantMessage,
-
-      )
-
+        content: data?.answer || 'I could not find an answer in this repository.',
+        sources: Array.isArray(data?.sources) ? data.sources : [],
+        suggestions: buildQuestionSuggestions({
+          repository,
+          currentQuestion: trimmedQuestion,
+          currentAnswer: data?.answer || '',
+          previousMessages: messages,
+          count: 5,
+        }),
+      })
     } catch (chatError) {
-
-      console.error(
-
-        'Chat error:',
-
-        chatError,
-
-      )
-
-
+      console.error('Chat error:', chatError)
 
       const errorMessage =
-
-        chatError?.message ||
-
-        'Unable to get an answer from CodeMind AI.'
-
-
+        chatError?.message || 'Unable to get an answer from CodeMind AI.'
 
       setError(errorMessage)
 
-
-
-
-
-      const assistantErrorMessage = {
-
-        id: getNextMessageId(),
-
-
-
+      addMessage({
+        id: createMessageId(),
         role: 'assistant',
-
-
-
-        content:
-
-          errorMessage,
-
-
-
+        content: errorMessage,
         sources: [],
-
-
-
         suggestions: [],
-
-
-
         isError: true,
-
-      }
-
-
-
-
-
-      addMessage(
-
-        assistantErrorMessage,
-
-      )
-
+      })
     } finally {
-
       setIsAsking(false)
 
-
-
       window.setTimeout(() => {
-
         textareaRef.current?.focus()
-
       }, 0)
-
     }
-
   }
 
-
-
-
-
-  /* =======================================================
-
-     KEYBOARD HANDLING
-
-     ======================================================= */
-
-
+  /* ---------------- KEYBOARD HANDLING ---------------- */
 
   const handleKeyDown = (event) => {
-
-    if (
-
-      event.key === 'Enter' &&
-
-      !event.shiftKey
-
-    ) {
-
+    if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
-
-
-
       handleAskQuestion()
-
     }
-
   }
 
-
-
-
-
-  /* =======================================================
-
-     NEW CHAT
-
-     ======================================================= */
-
-
+  /* ---------------- NEW CHAT ---------------- */
 
   const handleNewChat = () => {
+    if (isAsking) return
 
-    if (isAsking) {
-
-      return
-
-    }
-
-
-
-    const shouldClear =
-
-      window.confirm(
-
-        'Start a new chat? Your current chat history for this repository will be cleared.',
-
-      )
-
-
-
-    if (!shouldClear) {
-
-      return
-
-    }
-
-
-
-    removeChatHistory(
-
-      repositoryName,
-
+    const shouldClear = window.confirm(
+      'Start a new chat? Your current chat history for this repository will be cleared.',
     )
 
+    if (!shouldClear) return
 
+    removeChatHistory(repositoryName)
 
     setQuestion('')
-
     setError('')
 
-
-
     window.setTimeout(() => {
-
       textareaRef.current?.focus()
-
     }, 0)
-
   }
 
+  /* ---------------- REMOVE PROJECT ---------------- */
 
-
-
-
-  /* =======================================================
-
-     REMOVE PROJECT
-
-     ======================================================= */
-
-
-
-  const handleRemoveProject = (
-
-    projectName,
-
-    event,
-
-  ) => {
-
+  const handleRemoveProject = (projectName, event) => {
     event.stopPropagation()
 
+    if (!projectName) return
 
+    const shouldRemove = window.confirm(
+      `Remove "${projectName}" from your projects?`,
+    )
 
-    if (!projectName) {
-
-      return
-
-    }
-
-
-
-    const shouldRemove =
-
-      window.confirm(
-
-        `Remove "${projectName}" from your projects?`,
-
-      )
-
-
-
-    if (!shouldRemove) {
-
-      return
-
-    }
-
-
+    if (!shouldRemove) return
 
     removeChatHistory(projectName)
-
-
-
-    onRemoveProject?.(
-
-      projectName,
-
-    )
-
+    onRemoveProject?.(projectName)
   }
 
-
-
-
-
-  /* =======================================================
-
-     RENDER
-
-     ======================================================= */
-
-
+  /* ---------------- RENDER ---------------- */
 
   return (
-
     <div className="workspace">
-
-
-
       <header className="workspace-header">
-
-
-
         <div className="workspace-brand">
-
-
-
           <div className="workspace-brand-mark">
-
-            <span>
-
-              &lt;/&gt;
-
-            </span>
-
+            <span>&lt;/&gt;</span>
           </div>
-
-
 
           <div className="workspace-brand-text">
-
-
-
-            <span className="workspace-brand-name">
-
-              CodeMind
-
-            </span>
-
-
-
-            <span className="workspace-brand-ai">
-
-              AI
-
-            </span>
-
-
-
+            <span className="workspace-brand-name">CodeMind</span>
+            <span className="workspace-brand-ai">AI</span>
           </div>
-
-
-
         </div>
-
-
-
-
 
         <div className="workspace-repository">
-
-
-
           <span className="repository-status-dot" />
-
-
-
-          <span className="repository-name">
-
-            {repositoryName}
-
-          </span>
-
-
-
-          <span className="indexed-badge">
-
-            Indexed
-
-          </span>
-
-
-
+          <span className="repository-name">{repositoryName}</span>
+          <span className="indexed-badge">Indexed</span>
         </div>
-
-
-
-
 
         <div className="workspace-actions">
-
-
-
           <button
-
             type="button"
-
             className="header-action-button"
-
             onClick={handleNewChat}
-
             disabled={isAsking}
-
           >
-
             + New Chat
-
           </button>
-
-
-
-
 
           <button
-
             type="button"
-
             className="header-action-button primary-header-action"
-
             onClick={onNewProject}
-
             disabled={isAsking}
-
           >
-
             + New Project
-
           </button>
-
-
-
         </div>
-
-
-
       </header>
 
-
-
-
-
       <div className="workspace-body">
-
-
-
         <aside className="repository-sidebar">
-
-
-
           <div className="projects-section">
-
-
-
             <div className="projects-heading">
-
-
-
-              <span>
-
-                Your Projects
-
-              </span>
-
-
-
-
+              <span>Your Projects</span>
 
               <button
-
                 type="button"
-
                 className="sidebar-new-project-button"
-
                 onClick={onNewProject}
-
                 disabled={isAsking}
-
               >
-
-
-
-                <span className="new-project-plus">
-
-                  +
-
-                </span>
-
-
-
-                <span>
-
-                  New
-
-                </span>
-
-
-
+                <span className="new-project-plus">+</span>
+                <span>New</span>
               </button>
-
-
-
             </div>
-
-
-
-
 
             <div className="projects-list">
-
-
-
               {projects.length === 0 ? (
-
-
-
-                <div className="no-projects">
-
-                  No projects yet
-
-                </div>
-
-
-
+                <div className="no-projects">No projects yet</div>
               ) : (
+                projects.map((project) => {
+                  const projectName = project?.repository_name
+                  const isActive = projectName === repositoryName
 
+                  if (!projectName) return null
 
-
-                projects.map(
-
-                  (project) => {
-
-                    const projectName =
-
-                      project?.repository_name
-
-
-
-                    const isActive =
-
-                      projectName ===
-
-                      repositoryName
-
-
-
-                    if (!projectName) {
-
-                      return null
-
-                    }
-
-
-
-                    return (
-
-                      <div
-
-                        className={`project-item ${
-
-                          isActive
-
-                            ? 'project-item-active'
-
-                            : ''
-
-                        }`}
-
-                        key={projectName}
-
+                  return (
+                    <div
+                      className={`project-item ${
+                        isActive ? 'project-item-active' : ''
+                      }`}
+                      key={projectName}
+                    >
+                      <button
+                        type="button"
+                        className="project-select-button"
+                        onClick={() => onSelectProject?.(project)}
+                        disabled={isAsking}
                       >
+                        <span className="project-icon">◇</span>
+                        <span className="project-name">{projectName}</span>
+                      </button>
 
-
-
-                        <button
-
-                          type="button"
-
-                          className="project-select-button"
-
-                          onClick={() =>
-
-                            onSelectProject?.(
-
-                              project,
-
-                            )
-
-                          }
-
-                          disabled={isAsking}
-
-                        >
-
-
-
-                          <span className="project-icon">
-
-                            ◇
-
-                          </span>
-
-
-
-                          <span className="project-name">
-
-                            {projectName}
-
-                          </span>
-
-
-
-                        </button>
-
-
-
-
-
-                        <button
-
-                          type="button"
-
-                          className="project-remove-button"
-
-                          onClick={(event) =>
-
-                            handleRemoveProject(
-
-                              projectName,
-
-                              event,
-
-                            )
-
-                          }
-
-                          disabled={isAsking}
-
-                          aria-label={
-
-                            `Remove ${projectName}`
-
-                          }
-
-                          title="Remove project"
-
-                        >
-
-                          ×
-
-                        </button>
-
-
-
-                      </div>
-
-                    )
-
-                  },
-
-                )
-
-
-
+                      <button
+                        type="button"
+                        className="project-remove-button"
+                        onClick={(event) =>
+                          handleRemoveProject(projectName, event)
+                        }
+                        disabled={isAsking}
+                        aria-label={`Remove ${projectName}`}
+                        title="Remove project"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )
+                })
               )}
-
-
-
             </div>
-
-
-
           </div>
-
-
-
-
 
           <div className="sidebar-heading">
-
-
-
-            <span>
-
-              Current Repository
-
-            </span>
-
-
+            <span>Current Repository</span>
 
             <span className="file-count">
-
-              {repository?.total_files ||
-
-                files.length}{' '}
-
-              files
-
+              {repository?.total_files || files.length} files
             </span>
-
-
-
           </div>
 
-
-
-
-
-          <div className="repository-tree">
-
-
-
+          <div
+            className="repository-tree"
+            style={{
+              maxHeight: 'calc(100vh - 330px)',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              paddingRight: '4px',
+            }}
+          >
             <div className="tree-item tree-folder">
-
-
-
-              <span className="tree-chevron">
-
-                ›
-
-              </span>
-
-
-
-              <span className="tree-icon">
-
-                ▱
-
-              </span>
-
-
-
-              <span>
-
-                Source files
-
-              </span>
-
-
-
+              <span className="tree-chevron">›</span>
+              <span className="tree-icon">▱</span>
+              <span>Source files</span>
             </div>
 
-
-
-
-
-            {files.slice(0, 12).map(
-
-              (file, index) => (
-
+            {displayFiles.length > 0 ? (
+              displayFiles.map((file, index) => (
                 <div
-
                   className="tree-item tree-file"
-
-                  key={`${getFilePath(
-
-                    file,
-
-                  )}-${index}`}
-
+                  key={`${getFilePath(file)}-${index}`}
+                  title={getFilePath(file)}
                 >
-
-
-
-                  <span className="tree-file-icon">
-
-                    {getFileExtension(
-
-                      file,
-
-                    )}
-
-                  </span>
-
-
-
+                  <span className="tree-file-icon">{getFileExtension(file)}</span>
                   <span className="tree-file-name">
-
-                    {getDisplayFileName(
-
-                      file,
-
-                    )}
-
+                    {getDisplayFileName(file)}
                   </span>
-
-
-
                 </div>
-
-              ),
-
+              ))
+            ) : (
+              <div className="tree-more">No source files found</div>
             )}
-
-
-
-
-
-            {files.length > 12 && (
-
-
-
-              <div className="tree-more">
-
-                +{files.length - 12} more files
-
-              </div>
-
-
-
-            )}
-
-
-
           </div>
-
-
-
-
 
           <div className="sidebar-bottom">
-
-
-
-            <div className="sidebar-section-label">
-
-              Languages
-
-            </div>
-
-
-
-
+            <div className="sidebar-section-label">Languages</div>
 
             <div className="workspace-language-list">
-
-
-
               {languages.length > 0 ? (
-
-
-
-                languages.map(
-
-                  (language) => (
-
-                    <span
-
-                      className="workspace-language"
-
-                      key={language}
-
-                    >
-
-                      {language}
-
-                    </span>
-
-                  ),
-
-                )
-
-
-
+                languages.map((language) => (
+                  <span className="workspace-language" key={language}>
+                    {language}
+                  </span>
+                ))
               ) : (
-
-
-
-                <span className="workspace-language">
-
-                  Not detected
-
-                </span>
-
-
-
+                <span className="workspace-language">Not detected</span>
               )}
-
-
-
             </div>
-
-
-
           </div>
-
-
-
         </aside>
 
-
-
-
-
         <main className="workspace-main">
-
-
-
           {messages.length === 0 ? (
-
-
-
             <div className="workspace-welcome">
-
-
-
               <div className="assistant-mark">
-
-                <span>
-
-                  ✦
-
-                </span>
-
+                <span>✦</span>
               </div>
 
-
-
-
-
-              <h1>
-
-                Ask anything about your codebase.
-
-              </h1>
-
-
-
-
+              <h1>Ask anything about your codebase.</h1>
 
               <p>
-
-                CodeMind AI searches your repository
-
-                and uses the most relevant code to
-
-                answer your questions.
-
+                CodeMind AI searches your repository and uses the most relevant
+                code to answer your questions.
               </p>
 
-
-
-
-
               <div className="example-questions">
-
-
-
-                {initialSuggestions.map(
-
-                  (suggestion) => (
-
-
-
-                    <button
-
-                      type="button"
-
-                      key={suggestion}
-
-                      onClick={() =>
-
-                        handleAskQuestion(
-
-                          suggestion,
-
-                        )
-
-                      }
-
-                      disabled={isAsking}
-
-                    >
-
-                      {suggestion}
-
-                    </button>
-
-
-
-                  ),
-
-                )}
-
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-          ) : (
-
-
-
-            <div className="chat-history">
-
-
-
-              {messages.map(
-
-                (message) => (
-
-
-
-                  <div
-
-                    key={message.id}
-
-                    className={`chat-message ${
-
-                      message.role === 'user'
-
-                        ? 'user-message'
-
-                        : 'assistant-message'
-
-                    }`}
-
+                {initialSuggestions.map((suggestion) => (
+                  <button
+                    type="button"
+                    key={suggestion}
+                    onClick={() => handleAskQuestion(suggestion)}
+                    disabled={isAsking}
                   >
-
-
-
-                    {message.role === 'user' ? (
-
-
-
-                      <div className="user-message-content">
-
-
-
-                        <div className="message-label">
-
-                          You
-
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="chat-history">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`chat-message ${
+                    message.role === 'user' ? 'user-message' : 'assistant-message'
+                  }`}
+                >
+                  {message.role === 'user' ? (
+                    <div className="user-message-content">
+                      <div className="message-label">You</div>
+                      <div className="user-question">{message.content}</div>
+                    </div>
+                  ) : (
+                    <div className="assistant-message-content">
+                      <div className="assistant-message-header">
+                        <div className="assistant-mark small">
+                          <span>✦</span>
                         </div>
 
-
-
-                        <div className="user-question">
-
-                          {message.content}
-
+                        <div>
+                          <strong>CodeMind AI</strong>
+                          <span>
+                            {message.isError ? 'Error' : 'AI-generated answer'}
+                          </span>
                         </div>
-
-
-
                       </div>
 
-
-
-                    ) : (
-
-
-
-                      <div className="assistant-message-content">
-
-
-
-                        <div className="assistant-message-header">
-
-
-
-                          <div className="assistant-mark small">
-
-                            <span>
-
-                              ✦
-
-                            </span>
-
-                          </div>
-
-
-
-
-
-                          <div>
-
-
-
-                            <strong>
-
-                              CodeMind AI
-
-                            </strong>
-
-
-
-                            <span>
-
-                              {message.isError
-
-                                ? 'Error'
-
-                                : 'AI-generated answer'}
-
-                            </span>
-
-
-
-                          </div>
-
-
-
-                        </div>
-
-
-
-
-
-                        <div
-
-                          className={`assistant-answer ${
-
-                            message.isError
-
-                              ? 'assistant-error-answer'
-
-                              : ''
-
-                          }`}
-
-                        >
-
-                          {message.content}
-
-                        </div>
-
-
-
-
-
-                        {message.sources?.length > 0 && (
-
-
-
-                          <div className="message-sources">
-
-
-
-                            <h4>
-
-                              Relevant Sources
-
-                            </h4>
-
-
-
-
-
-                            {message.sources.map(
-
-                              (
-
-                                source,
-
-                                index,
-
-                              ) => (
-
-
-
-                                <div
-
-                                  className="source-card"
-
-                                  key={`${getSourceName(
-
-                                    source,
-
-                                  )}-${index}`}
-
-                                >
-
-
-
-                                  <strong>
-
-                                    {getSourceName(
-
-                                      source,
-
-                                    )}
-
-                                  </strong>
-
-
-
-
-
-                                  {getSourcePath(
-
-                                    source,
-
-                                  ) && (
-
-
-
-                                    <span className="source-path">
-
-
-
-                                      {getSourcePath(
-
-                                        source,
-
-                                      )}
-
-
-
-                                    </span>
-
-
-
-                                  )}
-
-
-
-
-
-                                  {getSourceRelevance(
-
-                                    source,
-
-                                  ) !== null && (
-
-
-
-                                    <span className="source-relevance">
-
-
-
-                                      Relevance:{' '}
-
-
-
-                                      {getSourceRelevance(
-
-                                        source,
-
-                                      ).toFixed(3)}
-
-
-
-                                    </span>
-
-
-
-                                  )}
-
-
-
-                                </div>
-
-
-
-                              ),
-
-                            )}
-
-
-
-                          </div>
-
-
-
-                        )}
-
-
-
-
-
-                        {!message.isError &&
-
-                          message.suggestions?.length >
-
-                            0 && (
-
-
-
-                            <div className="follow-up-suggestions">
-
-
-
-                              <span className="suggestions-title">
-
-                                You can also ask
-
-                              </span>
-
-
-
-
-
-                              <div className="suggestion-buttons">
-
-
-
-                                {message.suggestions.map(
-
-                                  (
-
-                                    suggestion,
-
-                                  ) => (
-
-
-
-                                    <button
-
-                                      type="button"
-
-                                      key={`${message.id}-${suggestion}`}
-
-                                      onClick={() =>
-
-                                        handleAskQuestion(
-
-                                          suggestion,
-
-                                        )
-
-                                      }
-
-                                      disabled={
-
-                                        isAsking
-
-                                      }
-
-                                    >
-
-                                      {suggestion}
-
-                                    </button>
-
-
-
-                                  ),
-
+                      <div
+                        className={`assistant-answer ${
+                          message.isError ? 'assistant-error-answer' : ''
+                        }`}
+                      >
+                        {message.content}
+                      </div>
+
+                      {message.sources?.length > 0 && (
+                        <div className="message-sources">
+                          <h4>Relevant Sources</h4>
+
+                          {message.sources.map((source, index) => {
+                            const sourcePath = getSourcePath(source)
+                            const relevance = getSourceRelevance(source)
+
+                            return (
+                              <div
+                                className="source-card"
+                                key={`${getSourceName(source)}-${index}`}
+                              >
+                                <strong>{getSourceName(source)}</strong>
+
+                                {sourcePath && (
+                                  <span className="source-path">
+                                    {sourcePath}
+                                  </span>
                                 )}
 
-
-
+                                {relevance !== null && (
+                                  <span className="source-relevance">
+                                    Relevance: {relevance.toFixed(3)}
+                                  </span>
+                                )}
                               </div>
+                            )
+                          })}
+                        </div>
+                      )}
 
+                      {!message.isError && message.suggestions?.length > 0 && (
+                        <div className="follow-up-suggestions">
+                          <span className="suggestions-title">
+                            You can also ask
+                          </span>
 
-
-                            </div>
-
-
-
-                          )}
-
-
-
-                      </div>
-
-
-
-                    )}
-
-
-
-                  </div>
-
-
-
-                ),
-
-              )}
-
-
-
-
+                          <div className="suggestion-buttons">
+                            {message.suggestions.map((suggestion) => (
+                              <button
+                                type="button"
+                                key={`${message.id}-${suggestion}`}
+                                onClick={() => handleAskQuestion(suggestion)}
+                                disabled={isAsking}
+                              >
+                                {suggestion}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
 
               {isAsking && (
-
-
-
                 <div className="chat-message assistant-message">
-
-
-
                   <div className="assistant-message-content">
-
-
-
                     <div className="assistant-message-header">
-
-
-
                       <div className="assistant-mark small">
-
-                        <span>
-
-                          ✦
-
-                        </span>
-
+                        <span>✦</span>
                       </div>
-
-
-
-
 
                       <div>
-
-
-
-                        <strong>
-
-                          CodeMind AI
-
-                        </strong>
-
-
-
-                        <span>
-
-                          Analyzing your codebase...
-
-                        </span>
-
-
-
+                        <strong>CodeMind AI</strong>
+                        <span>Analyzing your codebase...</span>
                       </div>
-
-
-
                     </div>
-
-
-
-
 
                     <div className="typing-indicator">
-
-
-
                       <span />
-
-
-
                       <span />
-
-
-
                       <span />
-
-
-
                     </div>
-
-
-
                   </div>
-
-
-
                 </div>
-
-
-
               )}
 
-
-
-
-
               <div ref={chatEndRef} />
-
-
-
             </div>
-
-
-
           )}
 
-
-
-
-
           <div className="workspace-input-container">
-
-
-
             <div className="workspace-input">
-
-
-
               <textarea
-
                 ref={textareaRef}
-
                 value={question}
-
-                onChange={(event) => {
-
-                  setQuestion(
-
-                    event.target.value,
-
-                  )
-
-                }}
-
+                onChange={(event) => setQuestion(event.target.value)}
                 onKeyDown={handleKeyDown}
-
                 placeholder="Ask a question about your code..."
-
-                rows="1"
-
+                rows={1}
                 disabled={isAsking}
-
               />
 
-
-
-
-
               <button
-
                 className="send-button"
-
                 type="button"
-
-                onClick={() =>
-
-                  handleAskQuestion()
-
-                }
-
-                disabled={
-
-                  !question.trim() ||
-
-                  isAsking
-
-                }
-
+                onClick={() => handleAskQuestion()}
+                disabled={!question.trim() || isAsking}
                 aria-label="Send question"
-
               >
-
-
-
-                {isAsking
-
-                  ? '…'
-
-                  : '↑'}
-
-
-
+                {isAsking ? '…' : '↑'}
               </button>
-
-
-
             </div>
-
-
-
-
 
             <div className="workspace-input-hint">
-
-
-
-              <span>
-
-                Enter to send
-
-              </span>
-
-
-
-              <span>
-
-                Shift + Enter for a new line
-
-              </span>
-
-
-
+              <span>Enter to send</span>
+              <span>Shift + Enter for a new line</span>
             </div>
 
-
-
-
-
-            {error && (
-
-
-
-              <div className="chat-error">
-
-                {error}
-
-              </div>
-
-
-
-            )}
-
-
-
+            {error && <div className="chat-error">{error}</div>}
           </div>
-
-
-
         </main>
-
-
-
       </div>
-
-
-
     </div>
-
   )
-
 }
-
-
-
-
-
-/* =========================================================
-
-   REPOSITORY FILE HELPERS
-
-   ========================================================= */
-
-
-
-function getFilePath(file) {
-
-  if (typeof file === 'string') {
-
-    return file
-
-  }
-
-
-
-  if (
-
-    !file ||
-
-    typeof file !== 'object'
-
-  ) {
-
-    return ''
-
-  }
-
-
-
-  return (
-
-    file.path ||
-
-    file.file ||
-
-    file.name ||
-
-    ''
-
-  )
-
-}
-
-
-
-
-
-function getDisplayFileName(file) {
-
-  const filePath =
-
-    getFilePath(file)
-
-
-
-  if (!filePath) {
-
-    return 'Unknown file'
-
-  }
-
-
-
-  const normalizedPath =
-
-    String(filePath).replaceAll(
-
-      '\\\\',
-
-      '/',
-
-    )
-
-
-
-  const parts =
-
-    normalizedPath.split('/')
-
-
-
-  return (
-
-    parts[parts.length - 1] ||
-
-    normalizedPath
-
-  )
-
-}
-
-
-
-
-
-function getFileExtension(file) {
-
-  const fileName =
-
-    getDisplayFileName(file)
-
-
-
-  const extension =
-
-    fileName.includes('.')
-
-      ? fileName.split('.').pop()
-
-      : ''
-
-
-
-  return extension
-
-    ? extension
-
-      .toUpperCase()
-
-      .slice(0, 4)
-
-    : 'FILE'
-
-}
-
-
-
-
-
-/* =========================================================
-
-   SOURCE HELPERS
-
-   ========================================================= */
-
-
-
-function getSourceName(source) {
-
-  if (typeof source === 'string') {
-
-    return getFileNameFromPath(
-
-      source,
-
-    )
-
-  }
-
-
-
-  if (
-
-    !source ||
-
-    typeof source !== 'object'
-
-  ) {
-
-    return 'Unknown source'
-
-  }
-
-
-
-  return (
-
-    source.filename ||
-
-    source.file_name ||
-
-    source.name ||
-
-    source.file ||
-
-    getFileNameFromPath(
-
-      source.path ||
-
-        source.file_path ||
-
-        '',
-
-    )
-
-  )
-
-}
-
-
-
-
-
-function getSourcePath(source) {
-
-  if (typeof source === 'string') {
-
-    return source
-
-  }
-
-
-
-  if (
-
-    !source ||
-
-    typeof source !== 'object'
-
-  ) {
-
-    return ''
-
-  }
-
-
-
-  return (
-
-    source.path ||
-
-    source.file_path ||
-
-    source.file ||
-
-    ''
-
-  )
-
-}
-
-
-
-
-
-function getSourceRelevance(source) {
-
-  if (
-
-    !source ||
-
-    typeof source !== 'object'
-
-  ) {
-
-    return null
-
-  }
-
-
-
-  const value =
-
-    source.relevance ??
-
-    source.score ??
-
-    source.similarity
-
-
-
-  const numericValue =
-
-    Number(value)
-
-
-
-  return Number.isFinite(
-
-    numericValue,
-
-  )
-
-    ? numericValue
-
-    : null
-
-}
-
-
-
-
-
-function getFileNameFromPath(path) {
-
-  if (!path) {
-
-    return 'Unknown source'
-
-  }
-
-
-
-  const normalizedPath =
-
-    String(path).replaceAll(
-
-      '\\\\',
-
-      '/',
-
-    )
-
-
-
-  const parts =
-
-    normalizedPath.split('/')
-
-
-
-  return (
-
-    parts[parts.length - 1] ||
-
-    normalizedPath
-
-  )
-
-}
-
-
-
-
 
 export default RepositoryWorkspace
