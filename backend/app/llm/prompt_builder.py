@@ -1,10 +1,10 @@
 class PromptBuilder:
     """
-    Builds context-aware prompts for CodeMind AI.
+    Builds context-aware prompts for RepoMind AI.
     """
 
     SYSTEM_PROMPT = """
-You are CodeMind AI, an expert AI repository assistant.
+You are RepoMind AI, an expert AI repository assistant.
 
 Your task is to answer questions using ONLY the repository context provided.
 
@@ -37,7 +37,6 @@ Important rules:
         context_blocks = []
 
         for chunk in retrieved_chunks:
-
             context_blocks.append(
                 f"""
 File: {chunk.get("file_name", "Unknown")}
@@ -50,9 +49,7 @@ Content:
 """.strip()
             )
 
-        repository_context = "\n\n".join(
-            context_blocks
-        )
+        repository_context = "\n\n".join(context_blocks)
 
         return f"""
 {self.SYSTEM_PROMPT}

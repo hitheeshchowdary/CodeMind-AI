@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from app.services.chat_service import ChatService
+from app.agents.graph import agent_graph
 
 
 router = APIRouter()
@@ -59,33 +59,48 @@ class ChatResponse(BaseModel):
 )
 async def chat(request: ChatRequest):
     """
-    Ask a question about an indexed repository.
+    Ask a question about an indexed repository
+    using the hybrid Agentic RAG workflow.
     """
 
     try:
-        chat_service = ChatService()
 
-        result = chat_service.ask(
-            repository_name=request.repository_name,
-            question=request.question,
-            top_k=request.top_k,
+        result = agent_graph.invoke(
+            {
+                "repository_name": request.repository_name,
+                "question": request.question,
+                "top_k": request.top_k,
+            }
         )
 
-        return result
+        return {
+            "answer": result.get(
+                "answer",
+                "I couldn't find enough information "
+                "in the repository."
+            ),
+            "sources": result.get(
+                "sources",
+                [],
+            ),
+        }
 
     except ValueError as e:
+
         raise HTTPException(
             status_code=400,
             detail=str(e)
         )
 
     except RuntimeError as e:
+
         raise HTTPException(
             status_code=503,
             detail=str(e)
         )
 
     except Exception as e:
+
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error: {str(e)}"

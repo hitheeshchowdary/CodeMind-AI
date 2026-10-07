@@ -1,3 +1,5 @@
+import time
+
 from ollama import Client
 
 
@@ -7,7 +9,6 @@ class LLMService:
     """
 
     def __init__(self):
-
         self.client = Client(
             host="http://localhost:11434"
         )
@@ -24,6 +25,11 @@ class LLMService:
         """
 
         try:
+            start_time = time.perf_counter()
+            print(
+                f"[LLMService] Prompt characters: "
+                f"{len(prompt):,}"
+            )
 
             response = self.client.chat(
                 model=self.model,
@@ -39,13 +45,19 @@ class LLMService:
                 },
             )
 
+            elapsed_time = time.perf_counter() - start_time
+
+            print(
+                f"[LLMService] Ollama generation: "
+                f"{elapsed_time:.2f} seconds"
+            )
+
             return (
                 response["message"]["content"]
                 .strip()
             )
 
         except Exception as error:
-
             raise RuntimeError(
                 f"Ollama Error: {error}"
             )

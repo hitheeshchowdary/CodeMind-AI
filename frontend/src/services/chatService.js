@@ -27,7 +27,7 @@ export async function askRepositoryQuestion({
 
   if (!response.ok) {
     throw new Error(
-      data?.detail || 'Unable to get an answer from CodeMind AI.',
+      data?.detail || 'Unable to get an answer from RepoMind AI.',
     )
   }
 

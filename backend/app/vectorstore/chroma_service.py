@@ -13,17 +13,14 @@ class ChromaService:
     """
 
     def __init__(self):
-        # Create / load persistent database
         self.client = chromadb.PersistentClient(
             path="./chroma_db"
         )
 
-        # Create / load collection
         self.collection = self.client.get_or_create_collection(
             name="repository_chunks"
         )
 
-        # Embedding service
         self.embedding_service = EmbeddingService()
 
     def add_chunks(self, chunks: list[Chunk]):
@@ -41,9 +38,7 @@ class ChromaService:
 
         for chunk in chunks:
             ids.append(chunk.chunk_id)
-
             documents.append(chunk.content)
-
             embeddings.append(chunk.embedding)
 
             metadatas.append(
@@ -68,12 +63,16 @@ class ChromaService:
         repository_name: str,
         query: str,
         top_k: int = 5,
+        file_name: str | None = None,
     ):
         """
         Search for the most relevant chunks in a repository.
 
-        Returns:
-            A list of clean chunk dictionaries.
+        If file_name is provided, retrieval is restricted
+        to that specific file.
+
+        Otherwise, semantic retrieval is performed across
+        the repository.
         """
 
         total_start = time.perf_counter()
@@ -91,7 +90,8 @@ class ChromaService:
         )
 
         embedding_time = (
-            time.perf_counter() - embedding_start
+            time.perf_counter()
+            - embedding_start
         )
 
         print(
@@ -100,7 +100,35 @@ class ChromaService:
         )
 
         # ----------------------------------------
-        # Step 2: Search ChromaDB
+        # Step 2: Build ChromaDB filter
+        # ----------------------------------------
+
+        if file_name:
+
+            where_filter = {
+                "$and": [
+                    {
+                        "repository_name": repository_name
+                    },
+                    {
+                        "file_name": file_name
+                    },
+                ]
+            }
+
+            print(
+                f"File-specific retrieval: "
+                f"{file_name}"
+            )
+
+        else:
+
+            where_filter = {
+                "repository_name": repository_name
+            }
+
+        # ----------------------------------------
+        # Step 3: Search ChromaDB
         # ----------------------------------------
 
         chroma_start = time.perf_counter()
@@ -108,13 +136,12 @@ class ChromaService:
         results = self.collection.query(
             query_embeddings=[query_embedding],
             n_results=top_k,
-            where={
-                "repository_name": repository_name
-            },
+            where=where_filter,
         )
 
         chroma_time = (
-            time.perf_counter() - chroma_start
+            time.perf_counter()
+            - chroma_start
         )
 
         print(
@@ -123,7 +150,7 @@ class ChromaService:
         )
 
         # ----------------------------------------
-        # Step 3: Format results
+        # Step 4: Format results
         # ----------------------------------------
 
         documents = results.get(
@@ -172,7 +199,8 @@ class ChromaService:
             )
 
         total_time = (
-            time.perf_counter() - total_start
+            time.perf_counter()
+            - total_start
         )
 
         print(
@@ -217,6 +245,8 @@ class ChromaService:
         except Exception:
             pass
 
-        self.collection = self.client.get_or_create_collection(
-            name="repository_chunks"
+        self.collection = (
+            self.client.get_or_create_collection(
+                name="repository_chunks"
+            )
         )

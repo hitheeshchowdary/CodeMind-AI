@@ -1,0 +1,131 @@
+[
+  {
+    "id": 1,
+    "category": "simple",
+    "question": "What is RepoMind AI?"
+  },
+  {
+    "id": 2,
+    "category": "simple",
+    "question": "What technologies are used in RepoMind AI?"
+  },
+  {
+    "id": 3,
+    "category": "simple",
+    "question": "What is the main purpose of this repository?"
+  },
+  {
+    "id": 4,
+    "category": "simple",
+    "question": "Does RepoMind AI use ChromaDB?"
+  },
+  {
+    "id": 5,
+    "category": "simple",
+    "question": "Which programming language is mainly used in the backend?"
+  },
+
+  {
+    "id": 6,
+    "category": "file_level",
+    "question": "Explain upload_service.py."
+  },
+  {
+    "id": 7,
+    "category": "file_level",
+    "question": "What does repository_service.py do?"
+  },
+  {
+    "id": 8,
+    "category": "file_level",
+    "question": "Explain chat_service.py."
+  },
+  {
+    "id": 9,
+    "category": "file_level",
+    "question": "What is the purpose of chroma_service.py?"
+  },
+  {
+    "id": 10,
+    "category": "file_level",
+    "question": "What does parser_api.py do?"
+  },
+
+  {
+    "id": 11,
+    "category": "code_level",
+    "question": "How does RepoMind AI generate embeddings for repository chunks?"
+  },
+  {
+    "id": 12,
+    "category": "code_level",
+    "question": "How are repository files split into chunks?"
+  },
+  {
+    "id": 13,
+    "category": "code_level",
+    "question": "How does the system retrieve relevant repository chunks?"
+  },
+  {
+    "id": 14,
+    "category": "code_level",
+    "question": "How does the system generate the final answer from retrieved context?"
+  },
+  {
+    "id": 15,
+    "category": "code_level",
+    "question": "How does RepoMind AI handle GitHub repository imports?"
+  },
+
+  {
+    "id": 16,
+    "category": "architecture",
+    "question": "What is the architecture of RepoMind AI?"
+  },
+  {
+    "id": 17,
+    "category": "architecture",
+    "question": "How does the frontend communicate with the backend?"
+  },
+  {
+    "id": 18,
+    "category": "architecture",
+    "question": "What is the repository indexing pipeline?"
+  },
+  {
+    "id": 19,
+    "category": "architecture",
+    "question": "How do the parser, chunking, embedding, and vector database components work together?"
+  },
+  {
+    "id": 20,
+    "category": "architecture",
+    "question": "How does a user question flow through the Agentic RAG system?"
+  },
+
+  {
+    "id": 21,
+    "category": "repository_level",
+    "question": "Explain how a repository goes from upload to being searchable."
+  },
+  {
+    "id": 22,
+    "category": "repository_level",
+    "question": "Explain the complete flow from a user question to the final answer."
+  },
+  {
+    "id": 23,
+    "category": "repository_level",
+    "question": "How do the backend services work together to answer repository questions?"
+  },
+  {
+    "id": 24,
+    "category": "repository_level",
+    "question": "How does the Agentic RAG workflow improve repository-level question answering?"
+  },
+  {
+    "id": 25,
+    "category": "repository_level",
+    "question": "Explain the difference between the fast RAG path and the Agentic RAG path in RepoMind AI."
+  }
+]

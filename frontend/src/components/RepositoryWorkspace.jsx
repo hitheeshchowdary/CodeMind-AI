@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { askRepositoryQuestion } from '../services/chatService'
 
-const CHAT_STORAGE_KEY = 'codemind_repository_chat_histories_v2'
+const CHAT_STORAGE_KEY = 'RepoMind_repository_chat_histories_v2'
 
 /* =========================================================
    QUESTION SUGGESTION ENGINE
@@ -711,7 +711,7 @@ function RepositoryWorkspace({
       console.error('Chat error:', chatError)
 
       const errorMessage =
-        chatError?.message || 'Unable to get an answer from CodeMind AI.'
+        chatError?.message || 'Unable to get an answer from RepoMind AI.'
 
       setError(errorMessage)
 
@@ -790,7 +790,7 @@ function RepositoryWorkspace({
           </div>
 
           <div className="workspace-brand-text">
-            <span className="workspace-brand-name">CodeMind</span>
+            <span className="workspace-brand-name">RepoMind</span>
             <span className="workspace-brand-ai">AI</span>
           </div>
         </div>
@@ -953,7 +953,7 @@ function RepositoryWorkspace({
               <h1>Ask anything about your codebase.</h1>
 
               <p>
-                CodeMind AI searches your repository and uses the most relevant
+                RepoMind AI searches your repository and uses the most relevant
                 code to answer your questions.
               </p>
 
@@ -992,7 +992,7 @@ function RepositoryWorkspace({
                         </div>
 
                         <div>
-                          <strong>CodeMind AI</strong>
+                          <strong>RepoMind AI</strong>
                           <span>
                             {message.isError ? 'Error' : 'AI-generated answer'}
                           </span>
@@ -1073,7 +1073,7 @@ function RepositoryWorkspace({
                       </div>
 
                       <div>
-                        <strong>CodeMind AI</strong>
+                        <strong>RepoMind AI</strong>
                         <span>Analyzing your codebase...</span>
                       </div>
                     </div>

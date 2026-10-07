@@ -1,0 +1,717 @@
+[
+  {
+    "id": 1,
+    "category": "simple",
+    "question": "What is RepoMind AI?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "RepoMind AI is an AI-powered application that helps developers understand software repositories using natural-language questions.",
+    "sources": [
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.521
+      },
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.506
+      }
+    ],
+    "source_count": 2,
+    "latency_seconds": 3.264
+  },
+  {
+    "id": 2,
+    "category": "simple",
+    "question": "What technologies are used in RepoMind AI?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "*   Technologies used in RepoMind AI:\n    *   Python\n    *   JavaScript\n    *   React\n    *   FastAPI\n    *   Ollama",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.566
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.52
+      }
+    ],
+    "source_count": 2,
+    "latency_seconds": 1.743
+  },
+  {
+    "id": 3,
+    "category": "simple",
+    "question": "What is the main purpose of this repository?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "The main purpose of this repository is to provide an AI-powered application that helps developers understand software repositories using natural-language questions.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.473
+      },
+      {
+        "file": "repository_parser.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/parser/repository_parser.py",
+        "relevance": 0.45
+      }
+    ],
+    "source_count": 2,
+    "latency_seconds": 1.009
+  },
+  {
+    "id": 4,
+    "category": "simple",
+    "question": "Does RepoMind AI use ChromaDB?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "Yes, RepoMind AI uses ChromaDB.",
+    "sources": [
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.501
+      },
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.489
+      }
+    ],
+    "source_count": 2,
+    "latency_seconds": 0.584
+  },
+  {
+    "id": 5,
+    "category": "simple",
+    "question": "Which programming language is mainly used in the backend?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "The main programming language used in the backend is Python.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.436
+      },
+      {
+        "file": "RepositoryWorkspace.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/components/RepositoryWorkspace.jsx",
+        "relevance": 0.424
+      },
+      {
+        "file": "question_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/question_service.py",
+        "relevance": 0.42
+      },
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.415
+      }
+    ],
+    "source_count": 4,
+    "latency_seconds": 1.25
+  },
+  {
+    "id": 6,
+    "category": "file_level",
+    "question": "Explain upload_service.py.",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "Upload Service Explanation:\n\nThe `upload_service.py` file is part of the backend application and handles the upload and processing of ZIP files. It provides a service for saving and extracting uploaded ZIP files, as well as cloning public GitHub repositories.\n\nThe service consists of two main methods:\n\n1. `save_and_extract`: This method saves the uploaded ZIP file to a destination directory and extracts its contents to a separate directory. The method returns the destination path and the extracted repository path.\n2. `clone_github_repository`: This method clones a public GitHub repository to a local directory. It takes the repository URL as input, validates it, and then clones the repository using the `zipfile` and `shutil` libraries.\n\nThe service uses the `UploadFile` class from the FastAPI framework to handle file uploads. The `save_and_extract` method uses the `shutil` library to copy the uploaded file to a destination directory, while the `clone_github_repository` method uses the `zipfile` library to extract the ZIP file's contents.\n\nThe service also includes error handling for cases where the repository URL is invalid or where the existing repository directory needs to be removed.",
+    "sources": [
+      {
+        "file": "upload_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/upload_service.py",
+        "relevance": 0.504
+      }
+    ],
+    "source_count": 1,
+    "latency_seconds": 4.469
+  },
+  {
+    "id": 7,
+    "category": "file_level",
+    "question": "What does repository_service.py do?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "**Repository Service Functionality**\n\nThe `repository_service.py` file is a service class that handles the analysis, indexing, and metadata storage of a repository. It provides the following functionality:\n\n*   Analyzes a repository by parsing its contents and collecting chunks.\n*   Deletes any existing data for the repository.\n*   Stores the chunks in a database (ChromaDB).\n*   Saves metadata for the repository.\n\nThe service class uses other services, such as `ChromaService` and `RepositoryMetadataService`, to perform these tasks. The `repository_service.py` file is responsible for orchestrating the entire process.",
+    "sources": [
+      {
+        "file": "repository_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/repository_service.py",
+        "relevance": 0.505
+      }
+    ],
+    "source_count": 1,
+    "latency_seconds": 2.29
+  },
+  {
+    "id": 8,
+    "category": "file_level",
+    "question": "Explain chat_service.py.",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "**Answer**\n\nThe `chat_service.py` file is a Python script that serves as the main orchestration service for RepoMind AI. It is responsible for classifying user questions, routing them to the appropriate strategy, retrieving repository metadata, and generating AI responses.\n\nThe file imports various services, including `ChromaService`, `PromptBuilder`, `LLMService`, `ProjectService`, `QuestionService`, and `RepositoryMetadataService`. These services are used to perform tasks such as building prompts, generating AI responses, and retrieving repository metadata.\n\nThe `chat_service.py` file has two main methods: `__init__` and `ask`. The `__init__` method initializes the services and sets up the orchestration process. The `ask` method is the main entry point for repository questions, where it classifies the user question, routes it to the appropriate strategy, and generates an AI response.\n\n**No specific code chunk is provided in the repository context for `chat_service.py`**, so I couldn't find any specific code snippet to explain.",
+    "sources": [
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.461
+      }
+    ],
+    "source_count": 1,
+    "latency_seconds": 3.831
+  },
+  {
+    "id": 9,
+    "category": "file_level",
+    "question": "What is the purpose of chroma_service.py?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "The purpose of chroma_service.py is to store and retrieve repository chunks using ChromaDB.",
+    "sources": [
+      {
+        "file": "chroma_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/vectorstore/chroma_service.py",
+        "relevance": 0.48
+      }
+    ],
+    "source_count": 1,
+    "latency_seconds": 0.704
+  },
+  {
+    "id": 10,
+    "category": "file_level",
+    "question": "What does parser_api.py do?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "Parser API File: parser_api.py\n\nThe parser_api.py file is responsible for creating a FastAPI API router that handles requests related to repository files.",
+    "sources": [
+      {
+        "file": "parser_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/parser_api.py",
+        "relevance": 0.509
+      }
+    ],
+    "source_count": 1,
+    "latency_seconds": 0.65
+  },
+  {
+    "id": 11,
+    "category": "code_level",
+    "question": "How does RepoMind AI generate embeddings for repository chunks?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "How does RepoMind AI generate embeddings for repository chunks?\n\nRepoMind AI uses ChromaDB for semantic retrieval and embeddings.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.56
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.541
+      }
+    ],
+    "source_count": 2,
+    "latency_seconds": 0.938
+  },
+  {
+    "id": 12,
+    "category": "code_level",
+    "question": "How are repository files split into chunks?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "**Chunking Process**\n\nRepository files are split into chunks using the `ChunkService` class, which is responsible for chunking the files. The chunking process is as follows:\n\n1. The `ChunkService` class takes a chunk number as input, which is set to 1 in the `chunk_service.py` file.\n2. The service creates a unique chunk ID by hashing a string that includes the repository name, file path, and chunk index.\n3. The chunk ID is used to create a new `Chunk` object, which contains information about the chunk, such as its ID, repository name, file name, file path, language, chunk index, content, and embedding.\n4. The chunk is added to a list of chunks, and the process is repeated for each file in the repository.\n\nThe chunking process is designed to improve repository processing speed, memory usage, and ChromaDB storage, as well as AI retrieval quality.",
+    "sources": [
+      {
+        "file": "chunk_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chunk_service.py",
+        "relevance": 0.561
+      },
+      {
+        "file": "repository_parser.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/parser/repository_parser.py",
+        "relevance": 0.516
+      },
+      {
+        "file": "repository_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/repository_service.py",
+        "relevance": 0.496
+      }
+    ],
+    "source_count": 3,
+    "latency_seconds": 3.703
+  },
+  {
+    "id": 13,
+    "category": "code_level",
+    "question": "How does the system retrieve relevant repository chunks?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "The system retrieves relevant repository chunks through the \"Code Chunking\" step in the repository processing pipeline.",
+    "sources": [
+      {
+        "file": "repository_parser.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/parser/repository_parser.py",
+        "relevance": 0.479
+      },
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.452
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.45
+      }
+    ],
+    "source_count": 3,
+    "latency_seconds": 0.847
+  },
+  {
+    "id": 14,
+    "category": "code_level",
+    "question": "How does the system generate the final answer from retrieved context?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "The system generates the final answer by using the retrieved context to provide the local LLM (Large Language Model) with the necessary information. The retrieved context is then used to generate a relevant answer.",
+    "sources": [
+      {
+        "file": "question_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/question_service.py",
+        "relevance": 0.434
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.419
+      },
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.419
+      }
+    ],
+    "source_count": 3,
+    "latency_seconds": 1.073
+  },
+  {
+    "id": 15,
+    "category": "code_level",
+    "question": "How does RepoMind AI handle GitHub repository imports?",
+    "route": "fast_rag",
+    "retry_count": 0,
+    "verification_status": "not_applicable",
+    "evidence_summary": "",
+    "answer": "Handling GitHub Repository Imports\n\nRepoMind AI handles GitHub repository imports by uploading the repository as a ZIP file. This process is described in the \"Upload Repository\" step of the workflow, which is part of the \"Getting Started\" section of the repository.\n\nAccording to the repository content, the user is instructed to clone the repository and then upload their project as a ZIP file. This implies that RepoMind AI is able to import GitHub repositories by processing the uploaded ZIP file and analyzing its contents.\n\nNo specific technical details are provided in the repository content about how RepoMind AI handles GitHub repository imports. However, based on the provided information, it appears that the system relies on the user uploading their repository as a ZIP file and then processing it to extract relevant code information.",
+    "sources": [
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.589
+      },
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.579
+      }
+    ],
+    "source_count": 2,
+    "latency_seconds": 3.005
+  },
+  {
+    "id": 16,
+    "category": "architecture",
+    "question": "What is the architecture of RepoMind AI?",
+    "route": "agentic",
+    "retry_count": 1,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 3 unique files. Average retrieval distance: 0.759. Implemented/current evidence: 6 chunks. Planned/future evidence: 2 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "Architecture\n================\n\nThe architecture of RepoMind AI is not explicitly described in the repository context. However, the provided files and code snippets suggest the following high-level overview:\n\n*   The application consists of a frontend and a backend.\n*   The frontend is built using React and Vite, and it provides a user interface for uploading repositories and asking questions.\n*   The backend is built using FastAPI and is responsible for processing the uploaded repository, analyzing the code, and generating answers.\n*   The backend uses a combination of services, including a chat service, a prompt builder, and an LLM service, to orchestrate the analysis and generation of answers.\n*   The LLM service is used to generate answers based on the retrieved repository context.\n\nWhile the repository context does not provide a detailed architecture diagram, it does suggest that RepoMind AI is a complex application that relies on a combination of services and technologies to provide its functionality.\n\nIf you have any further questions or would like more information on a specific aspect of the architecture, please let me know.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.5708629606953135
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.5704779215271596
+      },
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.5493364368461467
+      }
+    ],
+    "source_count": 3,
+    "latency_seconds": 7.237
+  },
+  {
+    "id": 17,
+    "category": "architecture",
+    "question": "How does the frontend communicate with the backend?",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 5 unique files. Average retrieval distance: 1.306. Implemented/current evidence: 7 chunks. Planned/future evidence: 1 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Project Overview**\n\nRepoMind AI is an AI-powered application that helps developers understand software repositories using natural-language questions.\n\n**Project Architecture**\n\nThe project consists of the following components:\n\n*   **Frontend**: Built using React and Vite, the frontend provides a user interface for uploading repositories and asking questions.\n*   **Backend**: Built using FastAPI and Uvicorn, the backend handles repository uploads, question processing, and response generation.\n*   **AI/ML**: Utilizes Sentence Transformers, Python AST, Retrieval-Augmented Generation (RAG), Ollama, and Llama 3.2 3B for natural language processing and code analysis.\n*   **Database**: Stores repository chunks using ChromaDB.\n\n**Communication between Frontend and Backend**\n\nThe frontend and backend communicate using RESTful APIs. The `askRepositoryQuestion` function in `chatService.js` sends a POST request to the backend with the repository name, question, and top K values. The backend processes the request, generates a response, and returns it to the frontend.\n\n**Repository Workflow**\n\nThe repository workflow involves the following steps:\n\n1.  **Upload Repository**: The user uploads their repository as a ZIP file.\n2.  **Analyze Code**: The system scans files, analyzes project structure, and extracts useful code information.\n3.  **Generate Response**: The backend processes the question, generates a response using the LLM, and returns it to the frontend.\n\n**Code Chunking and Embeddings**\n\nThe `ChromaService` class in `chroma_service.py` is responsible for storing and retrieving repository chunks using ChromaDB. It also uses the `EmbeddingService` to generate embeddings for the code chunks.\n\n**Repository Analytics**\n\nThe `RepositoryAnalytics` step in the pipeline analyzes the repository and generates analytics data. However, the specific implementation details are not provided in the repository context.\n\n**Follow-up Questions**\n\nThe repository context suggests that follow-up questions can be used to explore the",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.45239658434055463
+      },
+      {
+        "file": "chroma_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/vectorstore/chroma_service.py",
+        "relevance": 0.4067523955945721
+      },
+      {
+        "file": "chatService.js",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/services/chatService.js",
+        "relevance": 0.4433216931948975
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.44125495849831853
+      },
+      {
+        "file": "RepositoryWorkspace.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/components/RepositoryWorkspace.jsx",
+        "relevance": 0.4366261116489889
+      }
+    ],
+    "source_count": 5,
+    "latency_seconds": 8.705
+  },
+  {
+    "id": 18,
+    "category": "architecture",
+    "question": "What is the repository indexing pipeline?",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 5 unique files. Average retrieval distance: 1.141. Implemented/current evidence: 6 chunks. Planned/future evidence: 2 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Repository Indexing Pipeline**\n\nThe repository indexing pipeline is as follows:\n\n1.  **Repository ZIP**: The user uploads a repository as a ZIP file.\n2.  **Extraction**: The uploaded repository ZIP file is extracted.\n3.  **Repository Scanning**: The extracted repository is scanned.\n4.  **File Parsing**: The scanned repository is parsed.\n5.  **Python AST Analysis**: The parsed repository undergoes Python Abstract Syntax Tree (AST) analysis.\n6.  **Repository Analytics**: The analyzed repository is analyzed for analytics.\n7.  **Code Chunking**: The analyzed repository is chunked.\n8.  **Embeddings**: The chunked repository is embedded.\n9.  **ChromaDB**: The embedded repository is stored in ChromaDB.\n\nThis pipeline is used to process the uploaded repository and provide answers to user questions.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.5039770023388053
+      },
+      {
+        "file": "chroma_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/vectorstore/chroma_service.py",
+        "relevance": 0.44625185452669425
+      },
+      {
+        "file": "parser_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/parser_api.py",
+        "relevance": 0.4829254363745222
+      },
+      {
+        "file": "repository_parser.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/parser/repository_parser.py",
+        "relevance": 0.45901274434104516
+      },
+      {
+        "file": "upload_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/upload_api.py",
+        "relevance": 0.4481863738884643
+      }
+    ],
+    "source_count": 5,
+    "latency_seconds": 4.089
+  },
+  {
+    "id": 19,
+    "category": "architecture",
+    "question": "How do the parser, chunking, embedding, and vector database components work together?",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 5 unique files. Average retrieval distance: 1.246. Implemented/current evidence: 7 chunks. Planned/future evidence: 1 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Project Architecture**\n\nThe RepoMind AI project is an AI-powered application that helps developers understand software repositories using natural-language questions.\n\nThe project architecture consists of the following components:\n\n*   **Frontend**: Built using React and Vite, the frontend provides a user interface for uploading repositories and asking questions.\n*   **Backend**: Built using FastAPI and Python, the backend handles the logic for processing repository uploads, answering questions, and interacting with the ChromaDB vector database.\n*   **ChromaDB**: A vector database used for storing and retrieving repository chunks.\n*   **Ollama**: A local LLM (Large Language Model) used for generating repository-aware answers.\n\n**Component Relationships**\n\nThe provided repository context does not explicitly establish a clear relationship between the parser, chunking, embedding, and vector database components. However, the `chunk_service.py` file shows how the chunking process works, which involves splitting text into chunks using a chunk size and overlap.\n\nThe `chroma_service.py` file demonstrates how the ChromaDB vector database is used to store and retrieve repository chunks. The `embedding_service.py` file shows how embeddings are generated for chunk content.\n\nWhile there is no direct evidence of how the parser, chunking, embedding, and vector database components work together, the provided code and configuration suggest that the chunking process generates chunks that are then embedded and stored in ChromaDB. The ChromaDB vector database is used to retrieve these chunks and generate answers for user questions.\n\n**Conclusion**\n\nThe RepoMind AI project architecture consists of a frontend, backend, ChromaDB vector database, and Ollama local LLM. The chunking process generates chunks that are then embedded and stored in ChromaDB. However, the provided repository context does not explicitly establish a clear relationship between the parser, chunking, embedding, and vector database components.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.4848841333457262
+      },
+      {
+        "file": "chroma_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/vectorstore/chroma_service.py",
+        "relevance": 0.4316351870587161
+      },
+      {
+        "file": "chunk_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chunk_service.py",
+        "relevance": 0.4519891685640071
+      },
+      {
+        "file": "RepositoryWorkspace.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/components/RepositoryWorkspace.jsx",
+        "relevance": 0.4320473268700208
+      },
+      {
+        "file": "chatService.js",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/services/chatService.js",
+        "relevance": 0.4271019192532429
+      }
+    ],
+    "source_count": 5,
+    "latency_seconds": 8.214
+  },
+  {
+    "id": 20,
+    "category": "architecture",
+    "question": "How does a user question flow through the Agentic RAG system?",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 3 unique files. Average retrieval distance: 1.131. Implemented/current evidence: 6 chunks. Planned/future evidence: 2 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Repository Architecture Overview**\n\nThe RepoMind AI repository architecture is designed to analyze and understand software repositories using natural-language questions. The architecture consists of the following components:\n\n*   **Frontend**: Built using React and Vite, the frontend provides a user-friendly interface for uploading repositories, asking questions, and receiving answers.\n*   **Backend**: Built using FastAPI and Uvicorn, the backend handles repository uploads, analyzes the repository, and generates answers using a local LLM.\n*   **AI/ML**: The system utilizes Sentence Transformers, Python AST, Retrieval-Augmented Generation (RAG), Ollama, and Llama 3.2 3B for natural language processing and code analysis.\n*   **Database**: ChromaDB is used as the vector database for storing and retrieving code information.\n\n**Repository Processing Pipeline**\n\nThe repository processing pipeline consists of the following steps:\n\n1.  **Repository ZIP**: The user uploads a repository as a ZIP file.\n2.  **Extraction**: The repository is extracted and processed.\n3.  **Repository Scanning**: The repository is scanned for relevant code.\n4.  **File Parsing**: Files are parsed and analyzed.\n5.  **Python AST Analysis**: Python AST is used for code analysis.\n6.  **Repository Analytics**: Repository analytics are generated.\n7.  **Code Chunking**: Code is chunked for easier analysis.\n8.  **Embeddings**: Embeddings are generated for code and repository information.\n9.  **ChromaDB**: ChromaDB is used to store and retrieve code information.\n\n**Agentic RAG System**\n\nThe Agentic RAG system is used to answer user questions. However, the repository context does not provide enough information to answer this question accurately.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.4807801048950849
+      },
+      {
+        "file": "chat_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/chat_api.py",
+        "relevance": 0.43748713462263084
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.48215871896241996
+      }
+    ],
+    "source_count": 3,
+    "latency_seconds": 7.653
+  },
+  {
+    "id": 21,
+    "category": "repository_level",
+    "question": "Explain how a repository goes from upload to being searchable.",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 6 unique files. Average retrieval distance: 1.105. Implemented/current evidence: 7 chunks. Planned/future evidence: 1 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Repository Processing Pipeline**\n\nThe repository processing pipeline is as follows:\n\n1.  **Repository ZIP**: The user uploads a repository as a ZIP file.\n2.  **Extraction**: The repository ZIP file is extracted.\n3.  **Repository Scanning**: The extracted repository is scanned.\n4.  **File Parsing**: The scanned repository is parsed into files.\n5.  **Python AST Analysis**: The parsed files are analyzed using Python's Abstract Syntax Tree (AST).\n6.  **Repository Analytics**: The analyzed repository is analyzed for analytics.\n7.  **Code Chunking**: The analyzed repository is chunked into smaller units.\n8.  **Embeddings**: The chunked repository is embedded using ChromaDB.\n9.  **ChromaDB**: The embedded repository is stored in ChromaDB.\n\nThis pipeline is responsible for preparing the repository for analysis and answering user questions.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.5159287609867548
+      },
+      {
+        "file": "chroma_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/vectorstore/chroma_service.py",
+        "relevance": 0.4366289524600291
+      },
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.4743608129009551
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.47158501457771185
+      },
+      {
+        "file": "repository_parser.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/parser/repository_parser.py",
+        "relevance": 0.468479030102008
+      },
+      {
+        "file": "parser_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/parser_api.py",
+        "relevance": 0.4646114987331559
+      }
+    ],
+    "source_count": 6,
+    "latency_seconds": 4.256
+  },
+  {
+    "id": 22,
+    "category": "repository_level",
+    "question": "Explain the complete flow from a user question to the final answer.",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 5 unique files. Average retrieval distance: 1.166. Implemented/current evidence: 7 chunks. Planned/future evidence: 1 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Complete Flow from User Question to Final Answer**\n\n1. **User Question**: The user asks a question about the repository, such as \"What does this project do?\"\n2. **Repository Analysis**: The RepoMind AI system analyzes the repository, extracting relevant code and information.\n3. **Question Classification**: The system classifies the user's question into a specific category, such as \"project purpose\" or \"technology\".\n4. **Feature Question Generation**: Based on the question category, the system generates feature questions related to the repository, such as \"Which files implement the core functionality described above?\"\n5. **Code Retrieval**: The system retrieves the relevant code from the repository, using the feature questions as a guide.\n6. **Python AST Analysis**: The system analyzes the retrieved code using Python Abstract Syntax Trees (ASTs).\n7. **Repository Analytics**: The system generates repository analytics, such as code chunking and embeddings.\n8. **ChromaDB Storage**: The system stores the retrieved code and analytics in ChromaDB.\n9. **Embeddings Generation**: The system generates embeddings for the retrieved code, using the ChromaDB storage.\n10. **Retrieval-Augmented Generation (RAG)**: The system uses the embeddings and retrieved code to generate a final answer, using a local LLM.\n11. **Answer Generation**: The system generates a final answer to the user's question, using the RAG model.\n\n**Note**: The final answer is generated based on the evidence retrieved from the repository, and may not be exhaustive or complete.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.4787886270030341
+      },
+      {
+        "file": "chat_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/chat_api.py",
+        "relevance": 0.43054162450140115
+      },
+      {
+        "file": "chroma_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/vectorstore/chroma_service.py",
+        "relevance": 0.4282663484751035
+      },
+      {
+        "file": "RepositoryWorkspace.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/components/RepositoryWorkspace.jsx",
+        "relevance": 0.490785853380104
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.4807392991537642
+      }
+    ],
+    "source_count": 5,
+    "latency_seconds": 7.246
+  },
+  {
+    "id": 23,
+    "category": "repository_level",
+    "question": "How do the backend services work together to answer repository questions?",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 8 evidence chunks from 4 unique files. Average retrieval distance: 1.148. Implemented/current evidence: 6 chunks. Planned/future evidence: 2 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Project Overview**\n\nRepoMind AI is an AI-powered application that helps developers understand software repositories using natural-language questions.\n\n**Project Architecture**\n\nThe project consists of two main components:\n\n*   **Frontend**: Built using React and Vite, this component provides a user interface for uploading repositories and asking questions.\n*   **Backend**: Built using FastAPI and Python, this component handles the logic for processing repository questions and providing answers.\n\nThe project uses a pipeline for processing repositories, which includes:\n\n1.  **Repository ZIP**: The repository is uploaded as a ZIP file.\n2.  **Extraction**: The repository is extracted from the ZIP file.\n3.  **Repository Scanning**: The repository is scanned for relevant files.\n4.  **File Parsing**: The relevant files are parsed.\n5.  **Python AST Analysis**: The parsed files are analyzed using Python Abstract Syntax Trees (ASTs).\n6.  **Repository Analytics**: The repository is analyzed for analytics.\n7.  **Code Chunking**: The repository is chunked into smaller pieces.\n8.  **Embeddings**: The chunked code is embedded into a vector space.\n9.  **ChromaDB**: The embedded code is stored in a ChromaDB vector database.\n10. **Retrieval-Augmented Generation (RAG)**: The repository is used to generate answers using RAG.\n11. **Local LLM Inference using Ollama**: The repository is used to generate answers using a local LLM inference using Ollama.\n\n**Key Components**\n\n*   **Chat API**: Handles requests from the frontend to the backend.\n*   **Chat Service**: Provides a function to ask repository questions to the backend.\n*   **Chat Service (Python)**: Handles the logic for processing repository questions and providing answers.\n\n**Technologies Used**\n\n*   **React**: Frontend framework.\n*   **Vite**: Frontend build tool.\n*   **FastAPI**: Backend framework.\n*   **",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.4874726346782353
+      },
+      {
+        "file": "chat_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/chat_api.py",
+        "relevance": 0.4465411881765869
+      },
+      {
+        "file": "chatService.js",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/services/chatService.js",
+        "relevance": 0.48046045715580465
+      },
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.4625790574846269
+      }
+    ],
+    "source_count": 4,
+    "latency_seconds": 8.277
+  },
+  {
+    "id": 24,
+    "category": "repository_level",
+    "question": "How does the Agentic RAG workflow improve repository-level question answering?",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 7 evidence chunks from 4 unique files. Average retrieval distance: 0.951. Implemented/current evidence: 5 chunks. Planned/future evidence: 2 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Repository Context Analysis**\n\nThe repository context does not provide explicit information about the Agentic RAG workflow. The provided files and code snippets do not mention this workflow or its components.\n\n**Answer**\n\nI couldn't find any information about the Agentic RAG workflow in the repository context.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.5214306253518998
+      },
+      {
+        "file": "chat_api.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/api/chat_api.py",
+        "relevance": 0.4719225851022115
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.4942910516293423
+      },
+      {
+        "file": "chat_service.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/services/chat_service.py",
+        "relevance": 0.4899318075800881
+      }
+    ],
+    "source_count": 4,
+    "latency_seconds": 1.893
+  },
+  {
+    "id": 25,
+    "category": "repository_level",
+    "question": "Explain the difference between the fast RAG path and the Agentic RAG path in RepoMind AI.",
+    "route": "agentic",
+    "retry_count": 0,
+    "verification_status": "sufficient",
+    "evidence_summary": "Retrieved 7 evidence chunks from 3 unique files. Average retrieval distance: 0.890. Implemented/current evidence: 5 chunks. Planned/future evidence: 2 chunks. Required at least 5 chunks from 3 unique file(s).",
+    "answer": "**Answer**\n\nThe repository context does not provide explicit information about the fast RAG path and the Agentic RAG path in RepoMind AI. The repository context only mentions the use of Retrieval-Augmented Generation (RAG) in the FastAPI backend, but it does not specify the difference between the fast RAG path and the Agentic RAG path.",
+    "sources": [
+      {
+        "file": "README.md",
+        "path": "uploads/extracted/RepoMind-AI/README.md",
+        "relevance": 0.5405091526154997
+      },
+      {
+        "file": "main.py",
+        "path": "uploads/extracted/RepoMind-AI/backend/app/main.py",
+        "relevance": 0.49637512067496914
+      },
+      {
+        "file": "App.jsx",
+        "path": "uploads/extracted/RepoMind-AI/frontend/src/App.jsx",
+        "relevance": 0.4854206703157378
+      }
+    ],
+    "source_count": 3,
+    "latency_seconds": 2.175
+  }
+]

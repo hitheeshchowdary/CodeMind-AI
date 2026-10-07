@@ -1,24 +1,31 @@
+import re
 import time
+
 
 from app.vectorstore.chroma_service import (
     ChromaService,
 )
 
+
 from app.llm.prompt_builder import (
     PromptBuilder,
 )
+
 
 from app.llm.llm_service import (
     LLMService,
 )
 
+
 from app.services.project_service import (
     ProjectService,
 )
 
+
 from app.services.question_service import (
     QuestionService,
 )
+
 
 from app.services.repository_metadata_service import (
     RepositoryMetadataService,
@@ -27,7 +34,7 @@ from app.services.repository_metadata_service import (
 
 class ChatService:
     """
-    Main orchestration service for CodeMind AI.
+    Main orchestration service for RepoMind AI.
 
     Responsibilities:
 
@@ -79,9 +86,11 @@ class ChatService:
         total_start = time.perf_counter()
 
         print("\n" + "=" * 60)
+
         print(
-            "CODEMIND AI QUESTION"
+            "RepoMind AI QUESTION"
         )
+
         print("=" * 60)
 
         print(
@@ -174,6 +183,31 @@ class ChatService:
             f"Search query: {search_query}"
         )
 
+        # -----------------------------------------
+        # Detect exact file reference
+        # -----------------------------------------
+
+        file_reference = None
+
+        if question_type == "file_question":
+
+            file_reference = (
+                self._extract_file_reference(
+                    question
+                )
+            )
+
+            if file_reference:
+
+                print(
+                    f"Detected file reference: "
+                    f"{file_reference}"
+                )
+
+        # -----------------------------------------
+        # Retrieve relevant chunks
+        # -----------------------------------------
+
         retrieved_chunks = (
             self.chroma_service.search_chunks(
                 repository_name=repository_name,
@@ -182,6 +216,7 @@ class ChatService:
                     question_type,
                     top_k,
                 ),
+                file_name=file_reference,
             )
         )
 
@@ -382,6 +417,39 @@ class ChatService:
             "sources": [],
             "question_type": question_type,
         }
+
+    def _extract_file_reference(
+        self,
+        question: str,
+    ) -> str | None:
+        """
+        Extract an explicit filename from the user's question.
+
+        Example:
+            "Explain repository_service.py"
+            -> "repository_service.py"
+        """
+
+        pattern = (
+            r"\b[\w\-.]+(?:"
+            + "|".join(
+                re.escape(extension)
+                for extension
+                in self.question_service.FILE_EXTENSIONS
+            )
+            + r")\b"
+        )
+
+        match = re.search(
+            pattern,
+            question,
+            re.IGNORECASE,
+        )
+
+        if not match:
+            return None
+
+        return match.group(0)
 
     def _build_search_query(
         self,

@@ -1,8 +1,8 @@
-# CodeMind AI
+# RepoMind AI
 
 ### AI-Powered Repository Understanding Assistant
 
-CodeMind AI is an AI-powered application that helps developers understand software repositories using natural-language questions.
+RepoMind AI is an AI-powered application that helps developers understand software repositories using natural-language questions.
 
 Instead of manually searching through files, users can upload a repository and ask questions about its:
 
@@ -15,7 +15,7 @@ Instead of manually searching through files, users can upload a repository and a
 - Implementation logic
 - Code workflow
 
-CodeMind AI analyzes the repository, creates searchable code representations, retrieves relevant code, and uses a local LLM to generate repository-aware answers.
+RepoMind AI analyzes the repository, creates searchable code representations, retrieves relevant code, and uses a local LLM to generate repository-aware answers.
 
 ---
 
@@ -123,13 +123,13 @@ FastAPI Backend
       AI Answer
 
 🚀 Getting Started
-This section explains how to run CodeMind AI from a fresh clone.
+This section explains how to run RepoMind AI from a fresh clone.
 1. Clone the Repository
 Open PowerShell, Command Prompt, or Terminal and run:
-git clone https://github.com/hitheeshchowdary/CodeMind-AI.git
+git clone https://github.com/hitheeshchowdary/RepoMind-AI.git
 
 Move into the project:
-cd CodeMind-AI
+cd RepoMind-AI
 
 2. Backend Setup
 Open a terminal in the project root and move into the backend:
@@ -149,7 +149,7 @@ Install backend dependencies
 pip install -r requirements.txt
 
 3. Install and Setup Ollama
-CodeMind AI currently uses Ollama for local LLM inference.
+RepoMind AI currently uses Ollama for local LLM inference.
 Install Ollama on your system and download the required model:
 ollama pull llama3.2:3b
 
@@ -159,10 +159,10 @@ ollama list
 You should see:
 llama3.2:3b
 
-Make sure Ollama is running before using CodeMind AI.
+Make sure Ollama is running before using RepoMind AI.
 4. Start the Backend
 Make sure you are inside:
-CodeMind-AI/backend
+RepoMind-AI/backend
 
 Run:
 uvicorn app.main:app
@@ -172,7 +172,7 @@ Keep this terminal running while using the application.
 5. Start the Frontend
 Open a new terminal.
 Go back to the project root:
-cd CodeMind-AI
+cd RepoMind-AI
 
 Move into the frontend:
 cd frontend
@@ -190,8 +190,8 @@ Open that URL in your browser.
 🧾 Complete Command List
 If Python, Node.js, Git, and Ollama are already installed, the basic setup is:
 Terminal 1 — Backend
-git clone https://github.com/hitheeshchowdary/CodeMind-AI.git
-cd CodeMind-AI
+git clone https://github.com/hitheeshchowdary/RepoMind-AI.git
+cd RepoMind-AI
 cd backend
 python -m venv .venv
 
@@ -209,14 +209,14 @@ ollama pull llama3.2:3b
 
 Keep Ollama running.
 Terminal 3 — Frontend
-cd CodeMind-AI
+cd RepoMind-AI
 cd frontend
 npm install
 npm run dev
 
 Then open the URL provided by Vite.
 📂 Project Structure
-CodeMind-AI/
+RepoMind-AI/
 │
 ├── backend/
 │   ├── app/
@@ -251,7 +251,7 @@ CodeMind-AI/
 1. Start the backend.
 2. Start Ollama.
 3. Start the frontend.
-4. Open CodeMind AI in your browser.
+4. Open RepoMind AI in your browser.
 5. Upload a repository ZIP file.
 6. Wait for the repository to finish indexing.
 7. Ask questions about the repository.
@@ -270,7 +270,7 @@ How does the parsing process work?
 Where is the main application logic implemented?
 
 🔎 Repository Processing
-When a repository is uploaded, CodeMind AI processes it through the following pipeline:
+When a repository is uploaded, RepoMind AI processes it through the following pipeline:
 Repository ZIP
       ↓
 Extraction
@@ -310,15 +310,15 @@ AI Answer
 
 🧠 Why RAG?
 A general-purpose LLM does not automatically know the contents of a user's uploaded repository.
-CodeMind AI uses Retrieval-Augmented Generation (RAG) to provide relevant repository code to the LLM before generating an answer.
+RepoMind AI uses Retrieval-Augmented Generation (RAG) to provide relevant repository code to the LLM before generating an answer.
 This allows the system to answer questions using evidence retrieved from the uploaded repository rather than relying only on the model's pretrained knowledge.
 ⚡ Performance
-CodeMind AI separates repository retrieval from LLM generation.
+RepoMind AI separates repository retrieval from LLM generation.
 During development, semantic retrieval using embeddings and ChromaDB is significantly faster than local LLM generation.
 The current major response-latency component is local LLM inference.
 Performance optimization is therefore an important part of the project's ongoing development.
 🔬 Research Direction
-The current version of CodeMind AI provides a RAG-based repository understanding system.
+The current version of RepoMind AI provides a RAG-based repository understanding system.
 The next stage of the project is to introduce Agentic AI to make repository question answering more adaptive.
 The planned architecture will include:
 - Intelligent question routing

@@ -10,9 +10,9 @@ const API_BASE_URL = 'http://localhost:8000'
 
 
 
-const PROJECTS_STORAGE_KEY = 'codemind_projects'
+const PROJECTS_STORAGE_KEY = 'RepoMind_projects'
 
-const ACTIVE_PROJECT_KEY = 'codemind_active_project'
+const ACTIVE_PROJECT_KEY = 'RepoMind_active_project'
 
 
 
@@ -463,7 +463,7 @@ function App() {
 
       setError(
 
-        uploadError.message || 'Unable to connect to the CodeMind AI backend.',
+        uploadError.message || 'Unable to connect to the RepoMind AI backend.',
 
       )
 
@@ -538,7 +538,7 @@ function App() {
 
       setError(
         githubError.message ||
-          'Unable to connect to the CodeMind AI backend.',
+          'Unable to connect to the RepoMind AI backend.',
       )
     } finally {
       setIsGithubImporting(false)
@@ -689,7 +689,7 @@ function App() {
 
 
 
-          <span className="brand-name">CodeMind</span>
+          <span className="brand-name">RepoMind</span>
 
           <span className="brand-ai">AI</span>
 
@@ -735,7 +735,7 @@ function App() {
 
           <p className="hero-description">
 
-            Upload your repository and ask questions about your code. CodeMind
+            Upload your repository and ask questions about your code. RepoMind
 
             AI understands your project, finds relevant files, and gives you
 
@@ -1088,7 +1088,7 @@ function App() {
 
           <p className="section-description">
 
-            CodeMind AI analyzes your repository, finds the most relevant code,
+            RepoMind AI analyzes your repository, finds the most relevant code,
 
             and uses it to answer your questions with repository-aware context.
 
@@ -1106,7 +1106,7 @@ function App() {
 
               <p>
 
-                Upload your project as a ZIP file and CodeMind AI prepares it
+                Upload your project as a ZIP file and RepoMind AI prepares it
 
                 for analysis.
 
@@ -1178,7 +1178,7 @@ function App() {
 
               <p>
 
-                CodeMind AI searches the repository and retrieves the most
+                RepoMind AI searches the repository and retrieves the most
 
                 relevant code for your question.
 
@@ -1222,7 +1222,7 @@ function App() {
 
           <h2>
 
-            Explore <span className="gradient-text">CodeMind AI.</span>
+            Explore <span className="gradient-text">RepoMind AI.</span>
 
           </h2>
 
@@ -1230,7 +1230,7 @@ function App() {
 
           <p className="section-description">
 
-            View the source code and explore the implementation of CodeMind AI
+            View the source code and explore the implementation of RepoMind AI
 
             on GitHub.
 
@@ -1242,7 +1242,7 @@ function App() {
 
             className="github-button"
 
-            href="https://github.com/hitheeshchowdary/CodeMind-AI"
+            href="https://github.com/hitheeshchowdary/RepoMind-AI"
 
             target="_blank"
 
@@ -1262,7 +1262,7 @@ function App() {
 
       <footer className="footer">
 
-        <span>CodeMind AI</span>
+        <span>RepoMind AI</span>
 
         <span>Understand. Explore. Build.</span>
 

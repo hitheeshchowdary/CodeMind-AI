@@ -25,7 +25,7 @@ from app.api.project_api import (
 
 
 app = FastAPI(
-    title="CodeMind AI",
+    title="RepoMind AI",
     description=(
         "AI-powered repository analysis "
         "and code assistant."
@@ -81,7 +81,7 @@ app.include_router(
 def home():
     return {
         "message": (
-            "Welcome to CodeMind AI 🚀"
+            "Welcome to RepoMind AI 🚀"
         ),
     }
 
@@ -93,7 +93,7 @@ def home():
 @app.get("/health")
 def health_check():
     """
-    Check the health of CodeMind AI services.
+    Check the health of RepoMind AI services.
 
     Checks:
     - ChromaDB
